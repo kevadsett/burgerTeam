@@ -1,0 +1,8 @@
+{
+  "name": "burgerTeam",
+  "version": "0.0.1",
+  "description": "Multiplayer buger chefs!",
+  "dependencies": {
+    "express": "^4.10.2"
+  }
+}
