@@ -1,7 +1,6 @@
 var main = {
     preload: function() {
-        game.load.image('kittenA', 'images/kittenA.jpeg');
-        game.load.image('kittenB', 'images/kittenB.jpeg');
+        game.load.spritesheet('buttons', 'images/buttons.png', 210, 175);
     },
     create: function() {
         game.stage.backgroundColor = 0xffffff;
@@ -12,7 +11,7 @@ var main = {
 
         this.buttons = game.add.group();
         for (var i = 0; i < 5; i++) {
-            var button = game.add.button(i * 210, 390, 'kitten' + (i % 2 === 0 ? 'A' : 'B'), this.onButtonPressed);
+            var button = game.add.button(i * 210, 425, 'buttons', this.onButtonPressed, this, i, i, i, i);
             button.index = i;
             this.buttons.add(button);
         }
