@@ -5,7 +5,7 @@ var BurgerBit = function(x, y, frame, plate) {
 };
 
 BurgerBit.prototype = {
-    update: function(dt) {
-        this.sprite.x = game.burgerPosition[this.plateIndex].x;
+    update: function(newX) {
+        this.sprite.x = newX;
     }
 };
