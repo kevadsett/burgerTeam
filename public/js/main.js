@@ -16,8 +16,12 @@ var main = {
             x: 0,
             y: game.world.height / 2
         }];
-        this.plateIndex = 0;
+        game.burgerOrders = [new BurgerOrder(game.difficulty)];
         game.burgers = [new Burger(game.burgerPositions[0], 0)];
+        this.plateIndex = 0;
+
+        game.difficulty = 1;
+        game.strikes = 0;
 
         this.buttons = game.add.group();
         for (var i = 0; i < 5; i++) {
@@ -26,7 +30,7 @@ var main = {
             this.buttons.add(button);
         }
 
-        new BurgerOrder(1);
+        game.add.button(840, 0, 'buttons', this.onSubmitPressed, this, 4, 4, 4, 4);
     },
     update: function() {
         var dt = game.time.physicsElapsed;
@@ -39,6 +43,36 @@ var main = {
     },
     addBit: function(index) {
         game.burgers[this.plateIndex].addBit(index);
+    },
+    onSubmitPressed: function() {
+        var firstBurgerOrder = game.burgerOrders.shift();
+        var frontBurger = game.burgers.shift();
+        if (firstBurgerOrder.checkBurger(frontBurger)) {
+            console.log("You got it right!");
+            game.difficulty++;
+        } else {
+            console.log("You got it wrong!");
+            if (game.strikes === 3) {
+                console.log("Game over");
+                game.paused = true;
+            } else {
+                game.strikes++;
+            }
+        }
+        frontBurger.destroy();
+        firstBurgerOrder.destroy();
+        this.addNewOrder();
+    },
+    addNewOrder: function() {
+        game.burgerOrders.push(new BurgerOrder(game.difficulty));
+        game.burgerPositions.push({
+            x: 0,
+            y: game.world.height / 2
+        })
+        game.burgers.push(new Burger(game.burgerPositions[game.burgerPositions.length - 1]))
+    },
+    isBurgerCorrect: function(index) {
+        return game.burgerOrders[0].checkBurger(game.burgers[index]);
     }
 };
 var game = new Phaser.Game(1050, 600, Phaser.AUTO);

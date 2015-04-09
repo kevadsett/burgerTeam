@@ -8,20 +8,23 @@ var BurgerOrder = function(difficulty) {
     this.specification.push(0);
     this.y = this.specification.length * 32;
     var offset = this.specification.length * 8;
-    var burgerImage = game.add.group();
+    this.burgerImage = game.add.group();
     for (var i = 0; i < this.specification.length; i++) {
         var type = this.specification[i];
-        burgerImage.create(this.x, this.y - (i * 32), 'burger', type);
+        this.burgerImage.create(this.x, this.y - (i * 32), 'burger', type);
     }
-    burgerImage.scale.setTo(0.5, 0.5);
+    this.burgerImage.scale.setTo(0.5, 0.5);
 };
 
 BurgerOrder.prototype = {
 	checkBurger: function(burger) {
         var isCorrect = burger.bits.length === this.specification.length;
         for (var i = 0; i < burger.bits.length && isCorrect; i++) {
-            isCorrect = this.specification[i] === burger.bits[i];
+            isCorrect = this.specification[i] === burger.bits[i].type;
         }
         return isCorrect;
-	}
+	},
+    destroy: function() {
+        this.burgerImage.destroy();
+    }
 };
