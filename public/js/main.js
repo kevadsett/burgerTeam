@@ -1,4 +1,5 @@
-var main = {
+var socket;
+var setup = {
     preload: function() {
         game.load.spritesheet('buttons', 'images/buttons.png', 210, 175);
         game.load.spritesheet('burger', 'images/burger.png', 256, 32);
@@ -10,6 +11,33 @@ var main = {
         game.scale.pageAlignVertically = true;
         game.scale.setMinMax(0, 0, 1050, 600);
 
+        socket = io();
+        socket.on('enterLobby', function(players, lobbyId) {
+            console.log("Entering lobby " + lobbyId + ".");
+            if (players === 1) {
+                game.state.start('waiting');
+            } else {
+                game.state.start('main');
+            }
+        });
+        socket.on('lobbyFull', function(lobbyId) {
+            console.log("Lobby " + lobbyId + " is full, starting main state.");
+            game.state.start('main');
+        });
+        socket.on('playerLeft', function(lobbyId) {
+            console.log("Player left lobby " + lobbyId + ", changing to 'waiting' state.");
+            game.state.start('waiting');
+        });
+    }
+};
+
+var waiting = {
+    create: function() {
+        game.add.text(game.world.width / 2, game.world.height / 2, "Waiting for 2nd player");
+    }
+};
+var main = {
+    create: function() {
         game.speed = 20;
 
         game.burgerPositions = [{
@@ -68,13 +96,15 @@ var main = {
         game.burgerPositions.push({
             x: 0,
             y: game.world.height / 2
-        })
-        game.burgers.push(new Burger(game.burgerPositions[game.burgerPositions.length - 1]))
+        });
+        game.burgers.push(new Burger(game.burgerPositions[game.burgerPositions.length - 1]));
     },
     isBurgerCorrect: function(index) {
         return game.burgerOrders[0].checkBurger(game.burgers[index]);
     }
 };
 var game = new Phaser.Game(1050, 600, Phaser.AUTO);
+game.state.add('setup', setup);
+game.state.start('setup');
+game.state.add('waiting', waiting);
 game.state.add('main', main);
-game.state.start('main');
