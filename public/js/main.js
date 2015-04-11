@@ -1,4 +1,23 @@
 var socket;
+var clientColour;
+function setupSocketEvents() {
+    socket.on('enterLobby', function onEnterLobby(lobbyId, playerColour) {
+        console.log("Entering lobby " + lobbyId + ". You are the " + playerColour + " player.");
+        clientColour = playerColour;
+        game.state.start('waiting');
+    });
+    socket.on('lobbyReady', function onLobbyReady(lobbyId) {
+        console.log("Lobby " + lobbyId + " is ready, starting main state.");
+        game.state.start('main');
+    });
+    socket.on('playerLeft', function onPlayerLeft(lobbyId) {
+        console.log("Player left lobby " + lobbyId + ", changing to 'waiting' state.");
+        game.state.start('waiting');
+    });
+    socket.on('newOrder', function addOrder(spec) {
+        game.burgerOrders.push(new BurgerOrder(spec));
+    });
+}
 var setup = {
     preload: function() {
         game.load.spritesheet('buttons', 'images/buttons.png', 210, 175);
@@ -12,22 +31,7 @@ var setup = {
         game.scale.setMinMax(0, 0, 1050, 600);
 
         socket = io();
-        socket.on('enterLobby', function(players, lobbyId) {
-            console.log("Entering lobby " + lobbyId + ".");
-            if (players === 1) {
-                game.state.start('waiting');
-            } else {
-                game.state.start('main');
-            }
-        });
-        socket.on('lobbyFull', function(lobbyId) {
-            console.log("Lobby " + lobbyId + " is full, starting main state.");
-            game.state.start('main');
-        });
-        socket.on('playerLeft', function(lobbyId) {
-            console.log("Player left lobby " + lobbyId + ", changing to 'waiting' state.");
-            game.state.start('waiting');
-        });
+        setupSocketEvents();
     }
 };
 
@@ -44,7 +48,7 @@ var main = {
             x: 0,
             y: game.world.height / 2
         }];
-        game.burgerOrders = [new BurgerOrder(game.difficulty)];
+        game.burgerOrders = [];
         game.burgers = [new Burger(game.burgerPositions[0], 0)];
         this.plateIndex = 0;
 
@@ -59,6 +63,8 @@ var main = {
         }
 
         game.add.button(840, 0, 'buttons', this.onSubmitPressed, this, 4, 4, 4, 4);
+        console.log("Emitting ready signal");
+        socket.emit('playerReady');
     },
     update: function() {
         var dt = game.time.physicsElapsed;

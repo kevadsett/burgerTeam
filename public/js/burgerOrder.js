@@ -1,12 +1,7 @@
-var BurgerOrder = function(difficulty) {
+var BurgerOrder = function(spec) {
+    this.specification = spec;
     var i;
     this.x = 100;
-    this.specification = [0];
-    var bitsCount = Math.ceil(Math.random() * (difficulty + 1));
-    for (i = 0; i < bitsCount; i++) {
-        this.specification.push(Math.ceil(Math.random() * 4));
-    }
-    this.specification.push(0);
     this.y = this.specification.length * 32;
     var offset = this.specification.length * 8;
     this.burgerImage = game.add.group();
