@@ -1,5 +1,15 @@
 var socket;
 var clientColour;
+function setStatusText(text) {
+    if (game.statusText && game.statusText.exists) {
+        console.log("Setting existing text to \"" + text + "\"");
+        game.statusText.text = text;
+    } else {
+        console.log("Creating new text as \"" + text + "\"");
+        game.statusText = game.add.text(game.world.width / 2, game.world.height / 2, text);
+        game.statusText.anchor.setTo(0.5, 0.5);
+    }
+}
 function setupSocketEvents() {
     socket.on('enterLobby', function onEnterLobby(lobbyId, playerColour) {
         console.log("Entering lobby " + lobbyId + ". You are the " + playerColour + " player.");
@@ -14,8 +24,12 @@ function setupSocketEvents() {
         console.log("Player left lobby " + lobbyId + ", changing to 'waiting' state.");
         game.state.start('waiting');
     });
+    socket.on('gameStarted', function waitForReadyPlayers() {
+        console.log('Both players in lobby, waiting for ready signals');
+        setStatusText('Connecting to other player');
+    });
     socket.on('newOrder', function addOrder(spec) {
-        game.burgerOrders.push(new BurgerOrder(spec));
+        game.orders.push(new BurgerOrder(spec));
     });
 }
 var setup = {
@@ -37,20 +51,18 @@ var setup = {
 
 var waiting = {
     create: function() {
-        game.add.text(game.world.width / 2, game.world.height / 2, "Waiting for 2nd player");
+        setStatusText("Waiting for 2nd player");
     }
 };
 var main = {
     create: function() {
-        game.speed = 20;
-
-        game.burgerPositions = [{
-            x: 0,
-            y: game.world.height / 2
-        }];
-        game.burgerOrders = [];
-        game.burgers = [new Burger(game.burgerPositions[0], 0)];
-        this.plateIndex = 0;
+        console.log(game.statusText);
+        game.speed = 10;
+        game.difficulty = 1;
+        game.strikes = 0;
+        game.orders = [];
+        game.platePositions = [];
+        game.burgers = [];
 
         game.difficulty = 1;
         game.strikes = 0;
@@ -65,6 +77,7 @@ var main = {
         game.add.button(840, 0, 'buttons', this.onSubmitPressed, this, 4, 4, 4, 4);
         console.log("Emitting ready signal");
         socket.emit('playerReady');
+        socket.on('updateLoop', this.serverUpdate.bind(this));
     },
     update: function() {
         var dt = game.time.physicsElapsed;
@@ -72,14 +85,47 @@ var main = {
             game.burgers[i].update(dt);
         }
     },
+    serverUpdate: function(data) {
+        var i;
+        for (i = 0; i < game.platePositions.length; i++) {
+            game.platePositions[i].x = data.platePositions.x;
+            game.platePositions[i].y = data.platePositions.y;
+        }
+        if (i < data.platePositions.length) {
+            while (i < data.platePositions.length) {
+                game.platePositions.push({
+                    x: data.platePositions[i].x,
+                    y: data.platePositions[i].y
+                });
+                i++;
+            }
+        }
+        if (game.orders.length !== data.orders.length) {
+            game.orders = [];
+            // todo: wiping the whole thing ain't all that efficient...
+            for (i = 0; i < data.orders.length; i++) {
+                game.orders.push(new BurgerOrder(data.orders[i].target));
+            }
+        }
+        for (i = 0; i < game.burgers.length; i++) {
+            game.burgers[i].updateBits(data.burgers[i].bits);
+        }
+        while (i < data.burgers.length) {
+            game.burgers.push(new Burger(game.platePositions[i].x, game.platePositions[i].y, i, data.burgers[i].bits));
+            i++;
+        }
+        game.difficulty = data.difficulty;
+        game.strikes = data.strikes;
+    },
     onButtonPressed: function(button) {
         this.addBit(button.index);
     },
     addBit: function(index) {
-        game.burgers[this.plateIndex].addBit(index);
+        game.burgers[game.burgers.length - 1].addBit(index);
+        socket.emit('newBit', index);
     },
     onSubmitPressed: function() {
-        var firstBurgerOrder = game.burgerOrders.shift();
+        var firstBurgerOrder = game.orders.shift();
         var frontBurger = game.burgers.shift();
         if (firstBurgerOrder.checkBurger(frontBurger)) {
             console.log("You got it right!");
@@ -98,15 +144,15 @@ var main = {
         this.addNewOrder();
     },
     addNewOrder: function() {
-        game.burgerOrders.push(new BurgerOrder(game.difficulty));
-        game.burgerPositions.push({
+        game.orders.push(new BurgerOrder(game.difficulty));
+        game.platePositions.push({
             x: 0,
             y: game.world.height / 2
         });
-        game.burgers.push(new Burger(game.burgerPositions[game.burgerPositions.length - 1]));
+        game.burgers.push(new Burger(game.platePositions[game.platePositions.length - 1]));
     },
     isBurgerCorrect: function(index) {
-        return game.burgerOrders[0].checkBurger(game.burgers[index]);
+        return game.orders[0].checkBurger(game.burgers[index]);
     }
 };
 var game = new Phaser.Game(1050, 600, Phaser.AUTO);

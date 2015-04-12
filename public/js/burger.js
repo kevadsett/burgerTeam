@@ -1,5 +1,5 @@
-var Burger = function(position, plateIndex) {
-    this.bits = [];
+var Burger = function(position, plateIndex, bits) {
+    this.bits = bits || [];
     this.plateIndex = plateIndex;
     this.sliceIndex = 0;
     this.position = position;
@@ -12,8 +12,23 @@ Burger.prototype = {
             this.bits[i].update(this.position.x);
         }
     },
+    updateBits: function(newBits) {
+        if (newBits.length === 0) return;
+        for (var i = 0; i < this.bits.length; i++) {
+            this.bits[i].updateData(newBits[i]);
+        }
+        if (i < newBits.length) {
+            while (i < newBits.length) {
+                this.bits.push(new BurgerBit(newBits[i].x, newBits[i].y, newBits[i].type));
+                i++;
+            }
+        }
+        this.sliceIndex = i;
+    },
     addBit: function(type) {
-        this.bits.push(new BurgerBit(this.position.x, this.position.y - (this.sliceIndex * 32), type));
+        var bitX = this.position.x;
+        var bitY = this.position.y - (this.sliceIndex * 32);
+        this.bits.push(new BurgerBit(bitY, bitX, type));
         this.sliceIndex++;
     },
     destroy: function() {
