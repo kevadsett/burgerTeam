@@ -6,8 +6,8 @@ var Burger = function(position, plateIndex, bits) {
 };
 
 Burger.prototype = {
-    update: function(dt) {
-        this.position.x += dt * game.speed;
+    update: function(dt, speed) {
+        this.position.x += dt * speed;
         for (var i = 0; i < this.bits.length; i++) {
             this.bits[i].update(this.position.x);
         }

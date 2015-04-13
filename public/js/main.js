@@ -82,14 +82,14 @@ var main = {
     update: function() {
         var dt = game.time.physicsElapsed;
         for (var i = 0; i < game.burgers.length; i++) {
-            game.burgers[i].update(dt);
+            game.burgers[i].update(dt, game.speed);
         }
     },
     serverUpdate: function(data) {
         var i;
         for (i = 0; i < game.platePositions.length; i++) {
-            game.platePositions[i].x = data.platePositions.x;
-            game.platePositions[i].y = data.platePositions.y;
+            game.platePositions[i].x = data.platePositions[i].x;
+            game.platePositions[i].y = data.platePositions[i].y;
         }
         if (i < data.platePositions.length) {
             while (i < data.platePositions.length) {
@@ -111,11 +111,12 @@ var main = {
             game.burgers[i].updateBits(data.burgers[i].bits);
         }
         while (i < data.burgers.length) {
-            game.burgers.push(new Burger(game.platePositions[i].x, game.platePositions[i].y, i, data.burgers[i].bits));
+            game.burgers.push(new Burger(game.platePositions[i], i, data.burgers[i].bits));
             i++;
         }
         game.difficulty = data.difficulty;
         game.strikes = data.strikes;
+        game.speed = data.speed;
     },
     onButtonPressed: function(button) {
         this.addBit(button.index);
