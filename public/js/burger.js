@@ -24,6 +24,7 @@ Burger.prototype = {
             }
         }
         this.sliceIndex = i;
+        console.log(this.bits);
     },
     addBit: function(type) {
         var bitX = this.position.x;
@@ -36,5 +37,12 @@ Burger.prototype = {
             this.bits[i].destroy();
         }
         this.bits = null;
+    },
+    getSpec: function() {
+        var spec = [];
+        for (var i = 0; i < this.bits.length; i++) {
+            spec.push(this.bits[i].type);
+        }
+        return spec;
     }
 };

@@ -35,6 +35,7 @@ Game.prototype = {
     listenToPlayerEvents: function(player) {
         player.on('playerReady', this.onPlayerReady.bind(this, player));
         player.on('newBit', this.onNewBit.bind(this));
+        player.on('submitOrder', this.onSubmitOrder.bind(this));
     },
     onPlayerReady: function(player) {
         console.log(LOCATION, player.colour + " player ready (" + player.id + ")");
@@ -62,6 +63,29 @@ Game.prototype = {
         console.log(LOCATION, "Adding new " + type + " bit.");
         this.burgers[this.burgers.length - 1].addBit(type);
     },
+    onSubmitOrder: function(spec, burger) {
+        console.log(LOCATION, "Burger submitted:", spec, burger);
+        var burgerCorrect = BurgerSpec.checkBurger(spec, burger);
+        if (burgerCorrect) {
+            console.log("You got it right");
+            this.difficulty++;
+        } else {
+            console.log("You got it wrong");
+            if (this.strikes === 3) {
+                console.log("Game over");
+                this.gameOver = true;
+            } else {
+                this.strikes++;
+            }
+        }
+        this.popOrder();
+    },
+    popOrder: function() {
+        this.burgers.shift();
+        this.orders.shift();
+        this.platePositions.shift();
+        this.poppedOrder = true;
+    },
     update: function(dt) {
         if (/*Math.random() > 0.99 && */this.orders.length < 1) {
             this.newOrder();
@@ -74,8 +98,10 @@ Game.prototype = {
             platePositions: this.platePositions,
             burgers: this.burgers,
             speed: this.speed,
-            difficulty: this.difficulty
+            difficulty: this.difficulty,
+            popOrder: this.poppedOrder
         }, true);
+        this.poppedOrder = false;
     },
     broadcast: function(name, details, hideMessage) {
         if (!hideMessage) {
@@ -87,9 +113,9 @@ Game.prototype = {
         }
     },
     newOrder: function() {
-        var newOrder = new BurgerSpec(this.difficulty);
+        var newOrder = BurgerSpec.create(this.difficulty);
         this.orders.push(newOrder);
-        console.log(LOCATION, "New burger order: " + newOrder.target);
+        console.log(LOCATION, "New burger order: " + newOrder);
         this.platePositions.push({
             x: 0,
             y: gameSize.height / 2

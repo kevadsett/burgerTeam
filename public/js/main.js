@@ -28,9 +28,6 @@ function setupSocketEvents() {
         console.log('Both players in lobby, waiting for ready signals');
         setStatusText('Connecting to other player');
     });
-    socket.on('newOrder', function addOrder(spec) {
-        game.orders.push(new BurgerOrder(spec));
-    });
 }
 var setup = {
     preload: function() {
@@ -104,7 +101,7 @@ var main = {
             game.orders = [];
             // todo: wiping the whole thing ain't all that efficient...
             for (i = 0; i < data.orders.length; i++) {
-                game.orders.push(new BurgerOrder(data.orders[i].target));
+                game.orders.push(new BurgerOrder(data.orders[i]));
             }
         }
         for (i = 0; i < game.burgers.length; i++) {
@@ -128,6 +125,8 @@ var main = {
     onSubmitPressed: function() {
         var firstBurgerOrder = game.orders.shift();
         var frontBurger = game.burgers.shift();
+        console.log("Submitting order", firstBurgerOrder.specification, frontBurger.getSpec());
+        socket.emit('submitOrder', firstBurgerOrder.specification, frontBurger.getSpec());
         if (firstBurgerOrder.checkBurger(frontBurger)) {
             console.log("You got it right!");
             game.difficulty++;
@@ -142,7 +141,6 @@ var main = {
         }
         frontBurger.destroy();
         firstBurgerOrder.destroy();
-        this.addNewOrder();
     },
     addNewOrder: function() {
         game.orders.push(new BurgerOrder(game.difficulty));
