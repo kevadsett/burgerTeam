@@ -97,11 +97,20 @@ var main = {
                 i++;
             }
         }
-        if (game.orders.length !== data.orders.length) {
-            game.orders = [];
-            // todo: wiping the whole thing ain't all that efficient...
-            for (i = 0; i < data.orders.length; i++) {
+
+        if (game.orders.length > 0) {
+            console.log(game.orders[0].specification, data.orders[0]);
+        }
+
+        for (i = 0; i < game.orders.length && data.orders[i]; i++) {
+            game.orders[i].updateBits(data.orders[i]);
+        }
+        if (game.orders.length > data.orders.length) {
+            game.orders.splice(data.orders.length);
+        } else {
+            while (i < data.orders.length) {
                 game.orders.push(new BurgerOrder(data.orders[i]));
+                i++;
             }
         }
         for (i = 0; i < game.burgers.length; i++) {

@@ -84,7 +84,6 @@ Game.prototype = {
         this.burgers.shift();
         this.orders.shift();
         this.platePositions.shift();
-        this.poppedOrder = true;
     },
     update: function(dt) {
         if (/*Math.random() > 0.99 && */this.orders.length < 1) {
@@ -98,10 +97,8 @@ Game.prototype = {
             platePositions: this.platePositions,
             burgers: this.burgers,
             speed: this.speed,
-            difficulty: this.difficulty,
-            popOrder: this.poppedOrder
+            difficulty: this.difficulty
         }, true);
-        this.poppedOrder = false;
     },
     broadcast: function(name, details, hideMessage) {
         if (!hideMessage) {

@@ -13,7 +13,7 @@ module.exports = {
     checkBurger: function(targetSpec, burgerSpec) {
         var isCorrect = burgerSpec.length === targetSpec.length;
         for (var i = 0; i < burgerSpec.length && isCorrect; i++) {
-            isCorrect = targetSpec[i] === burgerSpec[i].type;
+            isCorrect = targetSpec[i] === burgerSpec[i];
         }
         return isCorrect;
     }

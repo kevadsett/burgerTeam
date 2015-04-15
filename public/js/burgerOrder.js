@@ -20,6 +20,19 @@ BurgerOrder.prototype = {
         }
         return isCorrect;
     },
+    updateBits: function(newBits) {
+        if (newBits.length < this.specification.length) {
+            this.burgerImage.removeAll();
+        }
+        for (var i = 0; i < newBits.length; i++) {
+            var existingBit = this.burgerImage.children[i] && this.burgerImage.getChildAt(i);
+            if (existingBit) {
+                existingBit.frame = newBits[i];
+            } else {
+                this.burgerImage.create(this.x, this.y - (i * 32), 'burger', newBits[i]);
+            }
+        }
+    },
     destroy: function() {
         this.burgerImage.destroy();
     }
