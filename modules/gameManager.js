@@ -1,6 +1,6 @@
 var BurgerSpec = require('../modules/burgerSpecification');
 var Burger = require('../modules/burger');
-var gameLoop = require('node-gameLoop');
+var gameLoop = require('node-gameloop');
 
 var LOCATION = "GAME_MANAGER::";
 
