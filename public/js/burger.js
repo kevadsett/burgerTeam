@@ -13,7 +13,9 @@ Burger.prototype = {
         }
     },
     updateBits: function(newBits) {
-        if (newBits.length === 0) return;
+        if (newBits.length === 0) {
+            return this.destroy();
+        }
         for (var i = 0; i < this.bits.length; i++) {
             this.bits[i].updateData(newBits[i]);
         }
@@ -36,7 +38,7 @@ Burger.prototype = {
         for (var i = 0; i < this.bits.length; i++) {
             this.bits[i].destroy();
         }
-        this.bits = null;
+        this.bits = [];
     },
     getSpec: function() {
         var spec = [];
