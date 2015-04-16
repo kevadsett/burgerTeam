@@ -14,7 +14,10 @@ var gameSize = {
 
 var Game = function(players) {
     this.difficulty = 1;
-    this.players = players;
+    this.players = {
+        blue: players[0],
+        red: players[1]
+    };
     this.readyPlayers = {
         red: false,
         blue: false
@@ -22,11 +25,11 @@ var Game = function(players) {
     this.index = gameIndex++;
     console.log(LOCATION, "Starting a game " + this.index);
     this.broadcast('gameStarted');
-    for (var i = 0; i < players.length; i++) {
-        var player = players[i];
-        this.readyPlayers[player.colour] = false;
+    for (var colour in this.players) {
+        var player = this.players[colour];
+        this.readyPlayers[colour] = false;
         player.game = this;
-        console.log(LOCATION, "Listening to " + player.colour + " player (" + player.id + ") for ready event");
+        console.log(LOCATION, "Listening to " + colour + " player (" + player.id + ") for ready event");
         this.listenToPlayerEvents(player);
     }
 };
@@ -58,6 +61,7 @@ Game.prototype = {
         this.platePositions = [];
         this.burgers = [];
         this.loop = gameLoop.setGameLoop(this.update.bind(this), 1000 / 10);
+        this.randomiseIngredients();
     },
     onNewBit: function(type) {
         console.log(LOCATION, "Adding new " + type + " bit.");
@@ -79,11 +83,25 @@ Game.prototype = {
             }
         }
         this.popOrder();
+        this.randomiseIngredients();
     },
     popOrder: function() {
         this.burgers.shift();
         this.orders.shift();
         this.platePositions.shift();
+    },
+    randomiseIngredients: function() {
+        var blueIngredients = [],
+            redIngredients = [];
+        for (var i = 0; i < 5; i++) {
+            if (Math.random() > 0.5) {
+                blueIngredients.push(i);
+            } else {
+                redIngredients.push(i);
+            }
+        }
+        this.players.blue.emit('ingredientsSet', blueIngredients);
+        this.players.red.emit('ingredientsSet', redIngredients);
     },
     update: function(dt) {
         if (/*Math.random() > 0.99 && */this.orders.length < 1) {
@@ -104,9 +122,11 @@ Game.prototype = {
         if (!hideMessage) {
             console.log(LOCATION, "Emitting" + name + " to players");
         }
-        for (var i = 0; i < this.players.length; i++) {
-            var player = this.players[i];
-            this.players[i].emit(name, details);
+        for (var colour in this.players) {
+            var player = this.players[colour];
+            if (player) {
+                player.emit(name, details);
+            }
         }
     },
     newOrder: function() {
@@ -122,8 +142,7 @@ Game.prototype = {
     destroy: function(playerWhoLeft) {
         console.log(LOCATION, playerWhoLeft.colour + " player left. Destroying game " + this.index);
         gameLoop.clearGameLoop(this.loop);
-        var playerIndex = this.players.indexOf(playerWhoLeft);
-        this.players.splice(playerIndex);
+        this.players[playerWhoLeft.colour] = null;
         this.broadcast('playerLeft');
         gameIndex--;
     }

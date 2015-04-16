@@ -28,6 +28,9 @@ function setupSocketEvents() {
         console.log('Both players in lobby, waiting for ready signals');
         setStatusText('Connecting to other player');
     });
+    socket.on('ingredientsSet', function setIngredientInterface(ingredients) {
+        events.emit('ingredientsSet', ingredients);
+    });
 }
 var setup = {
     preload: function() {
@@ -64,17 +67,12 @@ var main = {
         game.difficulty = 1;
         game.strikes = 0;
 
-        this.buttons = game.add.group();
-        for (var i = 0; i < 5; i++) {
-            var button = game.add.button(i * 210, 425, 'buttons', this.onButtonPressed, this, i, i, i, i);
-            button.index = i;
-            this.buttons.add(button);
-        }
+        game.interface = new Interface();
 
-        game.add.button(840, 0, 'buttons', this.onSubmitPressed, this, 4, 4, 4, 4);
         console.log("Emitting ready signal");
         socket.emit('playerReady');
         socket.on('updateLoop', this.serverUpdate.bind(this));
+        events.on('addBit', this.addBit, this);
     },
     update: function() {
         var dt = game.time.physicsElapsed;
@@ -124,32 +122,9 @@ var main = {
         game.strikes = data.strikes;
         game.speed = data.speed;
     },
-    onButtonPressed: function(button) {
-        this.addBit(button.index);
-    },
     addBit: function(index) {
         game.burgers[game.burgers.length - 1].addBit(index);
         socket.emit('newBit', index);
-    },
-    onSubmitPressed: function() {
-        var firstBurgerOrder = game.orders.shift();
-        var frontBurger = game.burgers.shift();
-        console.log("Submitting order", firstBurgerOrder.specification, frontBurger.getSpec());
-        socket.emit('submitOrder', firstBurgerOrder.specification, frontBurger.getSpec());
-        if (firstBurgerOrder.checkBurger(frontBurger)) {
-            console.log("You got it right!");
-            game.difficulty++;
-        } else {
-            console.log("You got it wrong!");
-            if (game.strikes === 3) {
-                console.log("Game over");
-                game.paused = true;
-            } else {
-                game.strikes++;
-            }
-        }
-        frontBurger.destroy();
-        firstBurgerOrder.destroy();
     },
     addNewOrder: function() {
         game.orders.push(new BurgerOrder(game.difficulty));
