@@ -13,7 +13,6 @@ var gameSize = {
 };
 
 var Game = function(players) {
-    this.difficulty = 1;
     this.players = {
         blue: players[0],
         red: players[1]
@@ -63,16 +62,16 @@ Game.prototype = {
         this.loop = gameLoop.setGameLoop(this.update.bind(this), 1000 / 10);
         this.randomiseIngredients();
     },
-    onNewBit: function(type) {
+    onNewBit: function(player, type) {
         console.log(LOCATION, "Adding new " + type + " bit.");
         this.burgers[this.burgers.length - 1].addBit(type);
+        this.players[player.colour === 'red' ? 'blue' : 'red'].emit('teammatePressed');
     },
     onSubmitOrder: function(spec, burger) {
         console.log(LOCATION, "Burger submitted:", spec, burger);
         var burgerCorrect = BurgerSpec.checkBurger(spec, burger);
         if (burgerCorrect) {
             console.log("You got it right");
-            this.difficulty++;
         } else {
             console.log("You got it wrong");
             if (this.strikes === 3) {

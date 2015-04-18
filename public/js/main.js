@@ -64,8 +64,6 @@ var main = {
         game.platePositions = [];
         game.burgers = [];
 
-        game.difficulty = 1;
-        game.strikes = 0;
 
         game.interface = new Interface();
 
@@ -118,7 +116,6 @@ var main = {
             game.burgers.push(new Burger(game.platePositions[i], i, data.burgers[i].bits));
             i++;
         }
-        game.difficulty = data.difficulty;
         game.strikes = data.strikes;
         game.speed = data.speed;
     },
