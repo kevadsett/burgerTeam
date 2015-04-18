@@ -59,6 +59,7 @@ Game.prototype = {
         this.orders = [];
         this.platePositions = [];
         this.burgers = [];
+        this.satisfaction = 100;
         this.loop = gameLoop.setGameLoop(this.update.bind(this), 1000 / 10);
         this.randomiseIngredients();
     },
@@ -72,12 +73,14 @@ Game.prototype = {
         var burgerCorrect = BurgerSpec.checkBurger(spec, burger);
         if (burgerCorrect) {
             console.log("You got it right");
+            this.satisfaction += 5;
         } else {
             console.log("You got it wrong");
             if (this.strikes === 3) {
                 console.log("Game over");
                 this.gameOver = true;
             } else {
+                this.satisfaction -= 5;
                 this.strikes++;
             }
         }
@@ -109,11 +112,13 @@ Game.prototype = {
         for (var i = 0; i < this.burgers.length; i++) {
             this.burgers[i].update(dt, this.speed);
         }
+        this.satisfaction -= dt * 1;
         this.broadcast('updateLoop', {
             orders: this.orders,
             platePositions: this.platePositions,
             burgers: this.burgers,
-            speed: this.speed
+            speed: this.speed,
+            satisfaction: this.satisfaction
         }, true);
     },
     broadcast: function(name, details, hideMessage) {

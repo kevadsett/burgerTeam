@@ -1,6 +1,8 @@
 var Interface = function() {
     events.on('ingredientsSet', this.onIngredientsSet, this);
     game.add.button(840, 0, 'buttons', this.onSubmitPressed, this, 4, 4, 4, 4);
+    this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
+    this.satisfactionMeter.anchor.setTo(0, 0.5);
 };
 
 Interface.prototype = {
@@ -8,24 +10,7 @@ Interface.prototype = {
         events.emit('addBit', button.index);
     },
     onSubmitPressed: function() {
-        var firstBurgerOrder = game.orders.shift();
-        var frontBurger = game.burgers.shift();
-        console.log("Submitting order", firstBurgerOrder.specification, frontBurger.getSpec());
-        socket.emit('submitOrder', firstBurgerOrder.specification, frontBurger.getSpec());
-        if (firstBurgerOrder.checkBurger(frontBurger)) {
-            console.log("You got it right!");
-            game.difficulty++;
-        } else {
-            console.log("You got it wrong!");
-            if (game.strikes === 3) {
-                console.log("Game over");
-                game.paused = true;
-            } else {
-                game.strikes++;
-            }
-        }
-        frontBurger.destroy();
-        firstBurgerOrder.destroy();
+        events.emit('submitOrder');
     },
     onIngredientsSet: function(ingredients) {
         if (this.buttons) {
@@ -39,5 +24,8 @@ Interface.prototype = {
             button.index = frame;
             this.buttons.add(button);
         }
+    },
+    updateSatisfaction: function(newSatisfaction) {
+        this.satisfactionMeter.scale.setTo(newSatisfaction / 100, 1);
     }
 };

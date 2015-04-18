@@ -36,6 +36,7 @@ var setup = {
     preload: function() {
         game.load.spritesheet('buttons', 'images/buttons.png', 210, 175);
         game.load.spritesheet('burger', 'images/burger.png', 256, 32);
+        game.load.image('satisfaction', 'images/satisfaction.png');
     },
     create: function() {
         game.stage.backgroundColor = 0xffffff;
@@ -70,6 +71,7 @@ var main = {
         game.orders = [];
         game.platePositions = [];
         game.burgers = [];
+        game.satisfaction = 100;
 
         game.teammate = new Teammate();
 
@@ -79,12 +81,15 @@ var main = {
         socket.emit('playerReady');
         socket.on('updateLoop', this.serverUpdate.bind(this));
         events.on('addBit', this.addBit, this);
+        events.on('submitOrder', this.submitOrder, this);
     },
     update: function() {
         var dt = game.time.physicsElapsed;
         for (var i = 0; i < game.burgers.length; i++) {
             game.burgers[i].update(dt, game.speed);
         }
+        game.satisfaction -= dt * 1;
+        game.interface.updateSatisfaction(game.satisfaction);
     },
     serverUpdate: function(data) {
         var i;
@@ -122,6 +127,7 @@ var main = {
         }
         game.strikes = data.strikes;
         game.speed = data.speed;
+        game.satisfaction = data.satisfaction;
     },
     addBit: function(index) {
         game.burgers[game.burgers.length - 1].addBit(index);
@@ -136,8 +142,26 @@ var main = {
         });
         game.burgers.push(new Burger(game.platePositions[game.platePositions.length - 1]));
     },
-    isBurgerCorrect: function(index) {
-        return game.orders[0].checkBurger(game.burgers[index]);
+    submitOrder: function() {
+        var firstBurgerOrder = game.orders.shift();
+        var frontBurger = game.burgers.shift();
+        console.log("Submitting order", firstBurgerOrder.specification, frontBurger.getSpec());
+        socket.emit('submitOrder', firstBurgerOrder.specification, frontBurger.getSpec());
+        if (firstBurgerOrder.checkBurger(frontBurger)) {
+            console.log("You got it right!");
+            game.satisfaction += 5;
+        } else {
+            console.log("You got it wrong!");
+            if (game.strikes === 3) {
+                console.log("Game over");
+                game.paused = true;
+            } else {
+                game.satisfaction -= 5;
+                game.strikes++;
+            }
+        }
+        frontBurger.destroy();
+        firstBurgerOrder.destroy();
     }
 };
 var game = new Phaser.Game(1050, 600, Phaser.AUTO);
