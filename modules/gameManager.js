@@ -36,7 +36,7 @@ var Game = function(players) {
 Game.prototype = {
     listenToPlayerEvents: function(player) {
         player.on('playerReady', this.onPlayerReady.bind(this, player));
-        player.on('newBit', this.onNewBit.bind(this));
+        player.on('newBit', this.onNewBit.bind(this, player));
         player.on('submitOrder', this.onSubmitOrder.bind(this));
     },
     checkAllPlayersReady: function() {
@@ -113,13 +113,12 @@ Game.prototype = {
             orders: this.orders,
             platePositions: this.platePositions,
             burgers: this.burgers,
-            speed: this.speed,
-            difficulty: this.difficulty
+            speed: this.speed
         }, true);
     },
     broadcast: function(name, details, hideMessage) {
         if (!hideMessage) {
-            console.log(LOCATION, "Emitting" + name + " to players");
+            console.log(LOCATION, "Emitting " + name + " to players");
         }
         for (var colour in this.players) {
             var player = this.players[colour];

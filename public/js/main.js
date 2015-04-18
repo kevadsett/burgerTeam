@@ -55,7 +55,14 @@ var waiting = {
     }
 };
 var main = {
+    preload: function() {
+        var teammateColour = clientColour === 'red' ? 'blue' : 'red';
+        var filename = 'images/' + teammateColour + 'Player.png';
+        console.log(filename);
+        game.load.spritesheet('teammate', filename, 358, 477);
+    },
     create: function() {
+        events.off();
         console.log(game.statusText);
         game.speed = 10;
         game.difficulty = 1;
@@ -64,6 +71,7 @@ var main = {
         game.platePositions = [];
         game.burgers = [];
 
+        game.teammate = new Teammate();
 
         game.interface = new Interface();
 
@@ -94,10 +102,6 @@ var main = {
             }
         }
 
-        if (game.orders.length > 0) {
-            console.log(game.orders[0].specification, data.orders[0]);
-        }
-
         for (i = 0; i < game.orders.length && data.orders[i]; i++) {
             game.orders[i].updateBits(data.orders[i]);
         }
@@ -121,6 +125,7 @@ var main = {
     },
     addBit: function(index) {
         game.burgers[game.burgers.length - 1].addBit(index);
+        console.log(index);
         socket.emit('newBit', index);
     },
     addNewOrder: function() {
