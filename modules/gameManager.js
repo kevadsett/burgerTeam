@@ -39,16 +39,16 @@ Game.prototype = {
         player.on('newBit', this.onNewBit.bind(this));
         player.on('submitOrder', this.onSubmitOrder.bind(this));
     },
+    checkAllPlayersReady: function() {
+        var redReady = this.players.red && this.players.red.ready;
+        var blueReady = this.players.blue && this.players.blue.ready;
+        return redReady && blueReady;
+    },
     onPlayerReady: function(player) {
         console.log(LOCATION, player.colour + " player ready (" + player.id + ")");
-        this.readyPlayers[player.colour] = true;
-        var allReady = true;
-        for (var key in this.readyPlayers) {
-            if (!this.readyPlayers[key]) {
-                allReady = false;
-            }
-        }
-        if (allReady) {
+        player.ready = true;
+        console.log(player.colour + ":", !!player);
+        if (this.checkAllPlayersReady()) {
             this.startGame();
         }
     },

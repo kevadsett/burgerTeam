@@ -30,7 +30,6 @@ Lobby.prototype = {
     },
     removeUser: function(user) {
         console.log(LOCATION, "Remove " + user.id + " from lobby " + this.index);
-        this.printUsers();
         delete userLobbyLookup[user.id];
         var userIndex = this.users.indexOf(user);
         if (userIndex > -1) {
@@ -39,6 +38,7 @@ Lobby.prototype = {
         if (this.users.length) {
             this.users[0].emit('playerLeft', this.index);
         }
+        this.printUsers();
     },
     isFull: function() {
         return this.users.length === 2;
