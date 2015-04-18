@@ -88,7 +88,7 @@ var main = {
         for (var i = 0; i < game.burgers.length; i++) {
             game.burgers[i].update(dt, game.speed);
         }
-        game.satisfaction -= dt * 1;
+        game.satisfaction = Math.max(0, game.satisfaction - dt * 1);
         game.interface.updateSatisfaction(game.satisfaction);
     },
     serverUpdate: function(data) {
@@ -149,7 +149,7 @@ var main = {
         socket.emit('submitOrder', firstBurgerOrder.specification, frontBurger.getSpec());
         if (firstBurgerOrder.checkBurger(frontBurger)) {
             console.log("You got it right!");
-            game.satisfaction += 5;
+            game.satisfaction = Math.min(100, game.satisfaction + 5);
         } else {
             console.log("You got it wrong!");
             if (game.strikes === 3) {
