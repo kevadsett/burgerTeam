@@ -13,17 +13,19 @@ var gameSize = {
 };
 
 var Game = function(players) {
-    this.players = {
-        blue: players[0],
-        red: players[1]
-    };
+    players[0].colour = Math.random > 0.5 ? 'red' : 'blue';
+    players[1].colour = players[0].colour === 'red' ? 'blue' : 'red';
+    this.players = {};
+    this.players[players[0].colour] = players[0];
+    this.players[players[1].colour] = players[1];
     this.readyPlayers = {
         red: false,
         blue: false
     };
     this.index = gameIndex++;
     console.log(LOCATION, "Starting a game " + this.index);
-    this.broadcast('gameStarted');
+    console.log(LOCATION, "Blue player: " + this.players.blue.id);
+    console.log(LOCATION, "Red player: " + this.players.red.id);
     for (var colour in this.players) {
         var player = this.players[colour];
         this.readyPlayers[colour] = false;
@@ -31,13 +33,22 @@ var Game = function(players) {
         console.log(LOCATION, "Listening to " + colour + " player (" + player.id + ") for ready event");
         this.listenToPlayerEvents(player);
     }
+    this.emitGameBegin();
 };
 
 Game.prototype = {
+    emitGameBegin: function() {
+        this.players.blue.emit('gameStarted', 'red', this.players.blue.isHost);
+        this.players.red.emit('gameStarted', 'blue', this.players.red.isHost);
+    },
     listenToPlayerEvents: function(player) {
         player.on('playerReady', this.onPlayerReady.bind(this, player));
         player.on('newBit', this.onNewBit.bind(this, player));
         player.on('submitOrder', this.onSubmitOrder.bind(this));
+        player.on('playAgain', function() {
+            this.emitGameBegin();
+            this.startGame();
+        }.bind(this));
     },
     checkAllPlayersReady: function() {
         var redReady = this.players.red && this.players.red.ready;
@@ -53,9 +64,9 @@ Game.prototype = {
         }
     },
     startGame: function() {
+        this.gameOver = false;
         this.speed = 10;
         this.difficulty = 1;
-        this.strikes = 0;
         this.orders = [];
         this.platePositions = [];
         this.burgers = [];
@@ -76,13 +87,7 @@ Game.prototype = {
             this.satisfaction = Math.min(100, this.satisfaction + 5);
         } else {
             console.log("You got it wrong");
-            if (this.strikes === 3) {
-                console.log("Game over");
-                this.gameOver = true;
-            } else {
-                this.satisfaction -= 5;
-                this.strikes++;
-            }
+            this.satisfaction = Math.max(0, this.satisfaction - 5);
         }
         this.popOrder();
         this.randomiseIngredients();
@@ -112,14 +117,19 @@ Game.prototype = {
         for (var i = 0; i < this.burgers.length; i++) {
             this.burgers[i].update(dt, this.speed);
         }
-        this.satisfaction = Math.max(0, this.satisfaction - dt * 1);
+        this.satisfaction = Math.max(0, this.satisfaction - dt * 5);
 
+        if (this.satisfaction === 0) {
+            this.gameOver = true;
+            gameLoop.clearGameLoop(this.loop);
+        }
         this.broadcast('updateLoop', {
             orders: this.orders,
             platePositions: this.platePositions,
             burgers: this.burgers,
             speed: this.speed,
-            satisfaction: this.satisfaction
+            satisfaction: this.satisfaction,
+            gameOver: this.gameOver
         }, true);
     },
     broadcast: function(name, details, hideMessage) {
