@@ -118,6 +118,10 @@ var gameOver = {
     },
     onPlayAgain: function() {
         socket.emit('playAgain');
+    },
+    onQuit: function() {
+        socket.emit('quit');
+        game.state.start('newGame');
     }
 };
 var main = {

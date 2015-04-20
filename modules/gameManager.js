@@ -49,6 +49,7 @@ Game.prototype = {
             this.emitGameBegin();
             this.startGame();
         }.bind(this));
+        player.on('quit', this.destroy.bind(this, player));
     },
     checkAllPlayersReady: function() {
         var redReady = this.players.red && this.players.red.ready;
