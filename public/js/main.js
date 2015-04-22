@@ -37,6 +37,7 @@ var setup = {
         game.load.image('tryAgainButton', 'images/tryAgain.png');
         game.load.image('playAgainButton', 'images/playAgain.png');
         game.load.image('quitButton', 'images/quit.png');
+        game.load.image('dispenser', 'images/dispenser.png');
     },
     create: function() {
         game.stage.backgroundColor = 0xffffff;
@@ -145,6 +146,8 @@ var main = {
 
         game.interface = new Interface();
 
+        game.dispenser = new Dispenser();
+
         console.log("Emitting ready signal");
         socket.emit('playerReady');
         socket.on('updateLoop', this.serverUpdate.bind(this));
@@ -155,6 +158,9 @@ var main = {
         var dt = game.time.physicsElapsed;
         for (var i = 0; i < game.burgers.length; i++) {
             game.burgers[i].update(dt, game.speed);
+        }
+        if (game.platePositions[0]) {
+            game.dispenser.updatePosition(game.platePositions[0].x);
         }
         game.satisfaction = Math.max(0, game.satisfaction - dt * 5);
         game.interface.updateSatisfaction(game.satisfaction);
