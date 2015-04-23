@@ -30,7 +30,7 @@ Burger.prototype = {
     addBit: function(type) {
         var bitX = this.position.x;
         var bitY = this.position.y - (this.sliceIndex * 32);
-        this.bits.push(new BurgerBit(bitY, bitX, type));
+        this.bits.push(new BurgerBit(bitX, bitY, type));
         this.sliceIndex++;
     },
     destroy: function() {
