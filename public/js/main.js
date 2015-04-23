@@ -1,3 +1,4 @@
+var debugMode = true;
 var socket;
 var teammateColour;
 var isHosting;
@@ -49,7 +50,12 @@ var setup = {
         socket = io();
         setupSocketEvents();
 
-        game.state.start('newGame');
+        if (debugMode) {
+            teammateColour = 'blue';
+            game.state.start('main');
+        } else {
+            game.state.start('newGame');
+        }
     }
 };
 
@@ -146,11 +152,18 @@ var main = {
 
         game.interface = new Interface();
 
+        if (debugMode) {
+            events.emit('ingredientsSet', [0,1,2,3,4]);
+            this.addNewOrder();
+        }
+
         game.dispenser = new Dispenser();
 
         console.log("Emitting ready signal");
-        socket.emit('playerReady');
-        socket.on('updateLoop', this.serverUpdate.bind(this));
+        if (!debugMode) {
+            socket.emit('playerReady');
+            socket.on('updateLoop', this.serverUpdate.bind(this));
+        }
         events.on('addBit', this.addBit, this);
         events.on('submitOrder', this.submitOrder, this);
     },
@@ -162,7 +175,9 @@ var main = {
         if (game.platePositions[0]) {
             game.dispenser.updatePosition(game.platePositions[0].x);
         }
-        game.satisfaction = Math.max(0, game.satisfaction - dt * 5);
+        if (!debugMode) {
+            game.satisfaction = Math.max(0, game.satisfaction - dt * 5);
+        }
         game.interface.updateSatisfaction(game.satisfaction);
     },
     serverUpdate: function(data) {
@@ -209,10 +224,12 @@ var main = {
     addBit: function(index) {
         game.burgers[game.burgers.length - 1].addBit(index);
         console.log(index);
-        socket.emit('newBit', index);
+        if (!debugMode) {
+            socket.emit('newBit', index);
+        }
     },
     addNewOrder: function() {
-        game.orders.push(new BurgerOrder(game.difficulty));
+        game.orders.push(new BurgerOrder([0,1,2,3,4,0]));
         game.platePositions.push({
             x: 0,
             y: game.world.height / 2
@@ -223,7 +240,9 @@ var main = {
         var firstBurgerOrder = game.orders.shift();
         var frontBurger = game.burgers.shift();
         console.log("Submitting order", firstBurgerOrder.specification, frontBurger.getSpec());
-        socket.emit('submitOrder', firstBurgerOrder.specification, frontBurger.getSpec());
+        if (!debugMode) {
+            socket.emit('submitOrder', firstBurgerOrder.specification, frontBurger.getSpec());
+        }
         if (firstBurgerOrder.checkBurger(frontBurger)) {
             console.log("You got it right!");
             game.satisfaction = Math.min(100, game.satisfaction + 5);
@@ -239,6 +258,10 @@ var main = {
         }
         frontBurger.destroy();
         firstBurgerOrder.destroy();
+        game.platePositions.shift();
+        if (debugMode) {
+            this.addNewOrder();
+        }
     }
 };
 var game = new Phaser.Game(1050, 600, Phaser.AUTO);
