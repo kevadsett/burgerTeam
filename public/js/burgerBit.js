@@ -1,6 +1,7 @@
-var BurgerBit = function(x, y, frame, plate) {
-    this.plateIndex = plate;
-    this.sprite = game.add.sprite(x, y, 'ingredients', frame);
+var BurgerBit = function(x, y, frame, group) {
+    this.sprite = game.add.sprite(x, 0, 'ingredients', frame);
+    group.add(this.sprite);
+    game.add.tween(this.sprite).to({y: y}, 125).start();
     this.sprite.anchor.setTo(0.5, 0.5);
     this.type = frame;
 };

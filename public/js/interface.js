@@ -1,6 +1,7 @@
 var Interface = function() {
     events.on('ingredientsSet', this.onIngredientsSet, this);
     game.add.sprite(0, 358, 'console');
+    this.dispenser = new Dispenser();
     this.buttons = game.add.group();
     this.icons = game.add.group();
     for (var i = 0; i < 4; i++) {
@@ -15,13 +16,17 @@ var Interface = function() {
 Interface.preload = function() {
     game.load.spritesheet('ingredientButton', 'images/ingredientButton.png', 123, 167);
     game.load.spritesheet('ingredientIcons', 'images/ingredientIcons.png', 95, 70);
-    game.load.image('dispenser', 'images/dispenser.png');
     game.load.image('console', 'images/console.png');
     game.load.image('goButton', 'images/goButton.png');
+    Dispenser.preload();
 };
 
 Interface.prototype = {
+    updateDispenserPosition: function(newX) {
+        this.dispenser.updatePosition(newX);
+    },
     onIngredientSelected: function(button) {
+        this.dispenser.playDispenseAnim();
         events.emit('addBit', button.ingredient);
     },
     onSubmitPressed: function() {

@@ -141,17 +141,16 @@ var main = {
     },
     create: function() {
         events.off();
-        game.speed = 10;
+        game.speed = 25;
         game.difficulty = 1;
         game.strikes = 0;
         game.orders = [];
         game.platePositions = [];
         game.burgers = [];
+        game.burgerGroup = game.add.group();
         game.satisfaction = 100;
 
         game.teammate = new Teammate();
-
-        game.dispenser = new Dispenser();
         game.interface = new Interface();
 
         if (debugMode) {
@@ -170,11 +169,15 @@ var main = {
     },
     update: function() {
         var dt = game.time.physicsElapsed;
-        for (var i = 0; i < game.burgers.length; i++) {
-            game.burgers[i].update(dt, game.speed);
+        var i;
+        for (i = 0; i < game.platePositions.length; i++) {
+            game.platePositions[i].x += dt * game.speed;
+        }
+        for (i = 0; i < game.burgers.length; i++) {
+            game.burgers[i].update();
         }
         if (game.platePositions[0]) {
-            game.dispenser.updatePosition(game.platePositions[0].x);
+            game.interface.updateDispenserPosition(game.platePositions[0].x);
         }
         if (!debugMode) {
             game.satisfaction = Math.max(0, game.satisfaction - dt * 5);

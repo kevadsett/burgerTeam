@@ -1,5 +1,7 @@
 var Burger = function(position, plateIndex, bits) {
     this.bits = bits || [];
+    this.bitGroup = game.add.group();
+    game.burgerGroup.add(this.bitGroup);
     this.plateIndex = plateIndex;
     this.sliceIndex = 0;
     this.position = position;
@@ -11,8 +13,7 @@ Burger.PATTY = 2;
 Burger.LETTUCE = 3;
 
 Burger.prototype = {
-    update: function(dt, speed) {
-        this.position.x += dt * speed;
+    update: function() {
         for (var i = 0; i < this.bits.length; i++) {
             this.bits[i].update(this.position.x);
         }
@@ -26,7 +27,7 @@ Burger.prototype = {
         }
         if (i < newBits.length) {
             while (i < newBits.length) {
-                this.bits.push(new BurgerBit(newBits[i].x, newBits[i].y, newBits[i].type));
+                this.bits.push(new BurgerBit(newBits[i].x, newBits[i].y, newBits[i].type, this.bitGroup));
                 i++;
             }
         }
@@ -35,7 +36,7 @@ Burger.prototype = {
     addBit: function(type) {
         var bitX = this.position.x;
         var bitY = this.position.y - (this.sliceIndex * 32);
-        this.bits.push(new BurgerBit(bitX, bitY, type));
+        this.bits.push(new BurgerBit(bitX, bitY, type, this.bitGroup));
         this.sliceIndex++;
     },
     destroy: function() {
