@@ -30,6 +30,9 @@ function setupSocketEvents() {
 }
 var setup = {
     preload: function() {
+        Interface.preload();
+        BurgerBit.preload();
+        BurgerOrder.preload();
         game.load.spritesheet('buttons', 'images/buttons.png', 210, 175);
         game.load.spritesheet('burger', 'images/burger.png', 256, 32);
         game.load.image('satisfaction', 'images/satisfaction.png');
@@ -38,7 +41,6 @@ var setup = {
         game.load.image('tryAgainButton', 'images/tryAgain.png');
         game.load.image('playAgainButton', 'images/playAgain.png');
         game.load.image('quitButton', 'images/quit.png');
-        game.load.image('dispenser', 'images/dispenser.png');
     },
     create: function() {
         game.stage.backgroundColor = 0xffffff;
@@ -139,7 +141,6 @@ var main = {
     },
     create: function() {
         events.off();
-        console.log(game.statusText);
         game.speed = 10;
         game.difficulty = 1;
         game.strikes = 0;
@@ -150,14 +151,14 @@ var main = {
 
         game.teammate = new Teammate();
 
+        game.dispenser = new Dispenser();
         game.interface = new Interface();
 
         if (debugMode) {
-            events.emit('ingredientsSet', [0,1,2,3,4]);
+            events.emit('ingredientsSet', [Burger.BUN_BOTTOM, Burger.PATTY, Burger.LETTUCE, Burger.BUN_TOP]);
             this.addNewOrder();
         }
 
-        game.dispenser = new Dispenser();
 
         console.log("Emitting ready signal");
         if (!debugMode) {
@@ -229,7 +230,7 @@ var main = {
         }
     },
     addNewOrder: function() {
-        game.orders.push(new BurgerOrder([0,1,2,3,4,0]));
+        game.orders.push(new BurgerOrder([Burger.BUN_BOTTOM, Burger.PATTY, Burger.LETTUCE, Burger.BUN_TOP]));
         game.platePositions.push({
             x: 0,
             y: game.world.height / 2

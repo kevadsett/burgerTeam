@@ -5,6 +5,11 @@ var Burger = function(position, plateIndex, bits) {
     this.position = position;
 };
 
+Burger.BUN_BOTTOM = 0;
+Burger.BUN_TOP = 1;
+Burger.PATTY = 2;
+Burger.LETTUCE = 3;
+
 Burger.prototype = {
     update: function(dt, speed) {
         this.position.x += dt * speed;

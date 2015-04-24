@@ -1,8 +1,12 @@
 var BurgerBit = function(x, y, frame, plate) {
     this.plateIndex = plate;
-    this.sprite = game.add.sprite(x, y, 'burger', frame);
+    this.sprite = game.add.sprite(x, y, 'ingredients', frame);
     this.sprite.anchor.setTo(0.5, 0.5);
     this.type = frame;
+};
+
+BurgerBit.preload = function() {
+    game.load.spritesheet('ingredients', 'images/ingredients.png', 171, 66);
 };
 
 BurgerBit.prototype = {

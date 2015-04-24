@@ -1,15 +1,19 @@
 var BurgerOrder = function(spec) {
     this.specification = spec;
+    console.log(spec);
     var i;
     this.x = 100;
-    this.y = this.specification.length * 32;
+    this.y = this.specification.length * 18;
     var offset = this.specification.length * 8;
     this.burgerImage = game.add.group();
     for (i = 0; i < this.specification.length; i++) {
         var type = this.specification[i];
-        this.burgerImage.create(this.x, this.y - (i * 32), 'burger', type);
+        this.burgerImage.create(this.x, this.y - (i * 18), 'orderIcons', type);
     }
-    this.burgerImage.scale.setTo(0.5, 0.5);
+};
+
+BurgerOrder.preload = function() {
+    game.load.spritesheet('orderIcons', 'images/orderIcons.png', 73, 18);
 };
 
 BurgerOrder.prototype = {
