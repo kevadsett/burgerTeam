@@ -140,26 +140,25 @@ var main = {
     },
     create: function() {
         events.off();
-        game.speed = 25;
+        game.speed = 50;
         game.difficulty = 1;
         game.strikes = 0;
         game.orders = [];
         game.plates = [];
         game.burgers = [];
-        game.burgerGroup = game.add.group();
+        game.teammate = new Teammate();
         game.satisfaction = 100;
         game.finalX = game.world.width - 100;
         game.CORRECT_REWARD = 5;
         game.INCORRECT_PENALTY = 5;
 
-        game.teammate = new Teammate();
+        game.burgerGroup = game.add.group();
         game.interface = new Interface();
 
         if (debugMode) {
             events.emit('ingredientsSet', [Burger.BUN_BOTTOM, Burger.PATTY, Burger.LETTUCE, Burger.BUN_TOP]);
             this.addNewOrder();
         }
-
 
         console.log("Emitting ready signal");
         if (!debugMode) {

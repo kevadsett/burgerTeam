@@ -22,8 +22,8 @@ Interface.preload = function() {
 };
 
 Interface.prototype = {
-    updateDispenserPosition: function(newX) {
-        this.dispenser.updatePosition(newX);
+    updateDispenserPosition: function(dt, newX, nextX) {
+        this.dispenser.updatePosition(dt, newX, nextX);
     },
     onIngredientSelected: function(button) {
         this.dispenser.playDispenseAnim();
@@ -46,5 +46,8 @@ Interface.prototype = {
     },
     updateSatisfaction: function(newSatisfaction) {
         // this.satisfactionMeter.scale.setTo(newSatisfaction / 100, 1);
+    },
+    playSubmitAnimation: function(callback, context) {
+        this.dispenser.playSubmitAnim(callback, context);
     }
 };
