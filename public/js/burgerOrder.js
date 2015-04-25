@@ -1,7 +1,8 @@
+var spriteHeight = 18;
+var rotateRange = Math.PI / 3;
 var BurgerOrder = function(spec) {
+    console.log("new order", spec);
     this.specification = spec;
-    var spriteHeight = 18;
-    console.log(spec);
     var i;
     var offset = (this.specification.length / 2) * spriteHeight;
     this.burgerImage = game.add.group();
@@ -18,7 +19,6 @@ var BurgerOrder = function(spec) {
         orderIcon.anchor.setTo(0.5, 0.5);
         this.burgerImage.add(orderIcon);
     }
-    var rotateRange = Math.PI / 3;
     this.burgerImage.rotation = (Math.random() * rotateRange) - (rotateRange / 2);
 };
 
@@ -36,17 +36,28 @@ BurgerOrder.prototype = {
         return isCorrect;
     },
     updateBits: function(newBits) {
-        if (newBits.length < this.specification.length) {
-            this.burgerImage.removeAll();
-        }
+        console.log(newBits);
+        console.log("Resetting bits");
+        this.burgerImage.removeAll();
+        var offset = (newBits.length / 2) * spriteHeight;
         for (var i = 0; i < newBits.length; i++) {
             var existingBit = this.burgerImage.children[i] && this.burgerImage.getChildAt(i);
             if (existingBit) {
+                console.log("Converting " + existingBit.frame + " to " + newBits[i]);
                 existingBit.frame = newBits[i];
             } else {
-                this.burgerImage.create(this.x, this.y - (i * 32), 'burger', newBits[i]);
+                console.log("Making new " + newBits[i]);
+                var orderIcon = game.add.sprite(0, offset + -(i * spriteHeight), 'orderIcons', newBits[i]);
+                orderIcon.anchor.setTo(0.5, 0.5);
+                this.burgerImage.add(orderIcon);
             }
         }
+        var slip = game.add.sprite(0, 0, 'orderSlip');
+        slip.anchor.setTo(0.5, 0.5);
+        slip.scale.setTo(0.8, 0.8);
+        this.burgerImage.addChildAt(slip, 0);
+        this.burgerImage.rotation = (Math.random() * rotateRange) - (rotateRange / 2);
+        this.specification = newBits;
     },
     destroy: function() {
         this.burgerImage.destroy();
