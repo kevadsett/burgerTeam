@@ -13,7 +13,6 @@ Dispenser.prototype = {
         if (!this.isSubmitting) {
             this.sprite.x = newX;
         } else if (this.movingBack) {
-            console.log("this.sprite.x:", this.sprite.x, " newX:", newX, " predictedNextX:", predictedNextX);
             if (this.sprite.x > predictedNextX) {
                 this.sprite.x -= dt * 1750;
 

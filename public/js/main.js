@@ -152,6 +152,7 @@ var main = {
         game.CORRECT_REWARD = 5;
         game.INCORRECT_PENALTY = 5;
 
+        game.ordersGroup = game.add.group();
         game.burgerGroup = game.add.group();
         game.interface = new Interface();
 
@@ -181,13 +182,18 @@ var main = {
             game.burgers[i].update();
         }
 
+        var newX = 0, nextX = 0;
         if (game.plates[0] && game.plates[0].position) {
-            var newX =  game.plates[0].position.x;
-            var nextX = game.plates[0].position.x + (dt * game.plates[0].speed);
-            game.interface.updateDispenserPosition(dt, newX, nextX);
+            newX =  game.plates[0].position.x;
+            nextX = game.plates[0].position.x + (dt * game.plates[0].speed);
         }
+        game.interface.updateDispenserPosition(dt, newX, nextX);
         if (!debugMode) {
             game.satisfaction = Math.max(0, game.satisfaction - dt * 5);
+        } else {
+            if (Math.random() > 0.995) {
+                this.addNewOrder();
+            }
         }
         game.interface.updateSatisfaction(game.satisfaction);
     },
@@ -230,7 +236,7 @@ var main = {
         game.satisfaction = data.satisfaction;
     },
     addBit: function(index) {
-        game.burgers[game.burgers.length - 1].addBit(index);
+        game.burgers[0].addBit(index);
         console.log(index);
         if (!debugMode) {
             socket.emit('newBit', index);
@@ -262,9 +268,6 @@ var main = {
         frontBurger.destroy();
         firstBurgerOrder.destroy();
         frontPlate.destroy();
-        if (debugMode) {
-            this.addNewOrder();
-        }
     }
 };
 var game = new Phaser.Game(1050, 600, Phaser.AUTO);
