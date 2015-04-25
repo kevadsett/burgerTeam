@@ -33,8 +33,7 @@ var setup = {
         Interface.preload();
         BurgerBit.preload();
         BurgerOrder.preload();
-        game.load.spritesheet('buttons', 'images/buttons.png', 210, 175);
-        game.load.spritesheet('burger', 'images/burger.png', 256, 32);
+        Plate.preload();
         game.load.image('satisfaction', 'images/satisfaction.png');
         game.load.image('hostGameButton', 'images/host.png');
         game.load.image('joinGameButton', 'images/join.png');
@@ -145,10 +144,13 @@ var main = {
         game.difficulty = 1;
         game.strikes = 0;
         game.orders = [];
-        game.platePositions = [];
+        game.plates = [];
         game.burgers = [];
         game.burgerGroup = game.add.group();
         game.satisfaction = 100;
+        game.finalX = game.world.width - 100;
+        game.CORRECT_REWARD = 5;
+        game.INCORRECT_PENALTY = 5;
 
         game.teammate = new Teammate();
         game.interface = new Interface();
@@ -166,18 +168,24 @@ var main = {
         }
         events.on('addBit', this.addBit, this);
         events.on('submitOrder', this.submitOrder, this);
+        events.on('submitPlate', this.submitPlate, this);
+        events.on('markOrder', this.markOrder, this);
+        events.on('submitAnimComplete', this.submitPlate, this);
     },
     update: function() {
         var dt = game.time.physicsElapsed;
         var i;
-        for (i = 0; i < game.platePositions.length; i++) {
-            game.platePositions[i].x += dt * game.speed;
+        for (i = 0; i < game.plates.length; i++) {
+            game.plates[i].update(dt);
         }
         for (i = 0; i < game.burgers.length; i++) {
             game.burgers[i].update();
         }
-        if (game.platePositions[0]) {
-            game.interface.updateDispenserPosition(game.platePositions[0].x);
+
+        if (game.plates[0] && game.plates[0].position) {
+            var newX =  game.plates[0].position.x;
+            var nextX = game.plates[0].position.x + (dt * game.plates[0].speed);
+            game.interface.updateDispenserPosition(dt, newX, nextX);
         }
         if (!debugMode) {
             game.satisfaction = Math.max(0, game.satisfaction - dt * 5);
@@ -189,16 +197,13 @@ var main = {
             return game.state.start('gameOver');
         }
         var i;
-        for (i = 0; i < game.platePositions.length; i++) {
-            game.platePositions[i].x = data.platePositions[i].x;
-            game.platePositions[i].y = data.platePositions[i].y;
+        for (i = 0; i < game.plates.length; i++) {
+            game.plates[i].position.x = data.platePositions[i].x;
+            game.plates[i].position.y = data.platePositions[i].y;
         }
         if (i < data.platePositions.length) {
             while (i < data.platePositions.length) {
-                game.platePositions.push({
-                    x: data.platePositions[i].x,
-                    y: data.platePositions[i].y
-                });
+                game.plates.push(new Plate(game.speed));
                 i++;
             }
         }
@@ -218,7 +223,7 @@ var main = {
             game.burgers[i].updateBits(data.burgers[i].bits);
         }
         while (i < data.burgers.length) {
-            game.burgers.push(new Burger(game.platePositions[i], i, data.burgers[i].bits));
+            game.burgers.push(new Burger(game.plates[i].position, i, data.burgers[i].bits));
             i++;
         }
         game.strikes = data.strikes;
@@ -234,35 +239,30 @@ var main = {
     },
     addNewOrder: function() {
         game.orders.push(new BurgerOrder([Burger.BUN_BOTTOM, Burger.PATTY, Burger.LETTUCE, Burger.BUN_TOP]));
-        game.platePositions.push({
-            x: 0,
-            y: game.world.height / 2
-        });
-        game.burgers.push(new Burger(game.platePositions[game.platePositions.length - 1]));
+        game.plates.push(new Plate(game.speed));
+        game.burgers.push(new Burger(game.plates[game.plates.length - 1].position));
     },
     submitOrder: function() {
+        if (!debugMode) {
+            socket.emit('submitOrder', game.orders[0].specification, game.burgers[0].getSpec());
+        }
+        game.plates[0].beingSubmitted = true;
+        game.interface.playSubmitAnimation();
+    },
+    submitPlate: function() {
         var firstBurgerOrder = game.orders.shift();
         var frontBurger = game.burgers.shift();
-        console.log("Submitting order", firstBurgerOrder.specification, frontBurger.getSpec());
-        if (!debugMode) {
-            socket.emit('submitOrder', firstBurgerOrder.specification, frontBurger.getSpec());
-        }
+        var frontPlate = game.plates.shift();
         if (firstBurgerOrder.checkBurger(frontBurger)) {
             console.log("You got it right!");
-            game.satisfaction = Math.min(100, game.satisfaction + 5);
+            game.satisfaction = Math.min(100, game.satisfaction + game.CORRECT_REWARD);
         } else {
             console.log("You got it wrong!");
-            if (game.strikes === 3) {
-                console.log("Game over");
-                game.paused = true;
-            } else {
-                game.satisfaction -= 5;
-                game.strikes++;
-            }
+            game.satisfaction = Math.min(100, game.satisfaction - game.INCORRECT_PENALTY);
         }
         frontBurger.destroy();
         firstBurgerOrder.destroy();
-        game.platePositions.shift();
+        frontPlate.destroy();
         if (debugMode) {
             this.addNewOrder();
         }
