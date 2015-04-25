@@ -1,4 +1,7 @@
-var debugMode = true;
+var debugMode = false;
+var SATISFACTION_RATE = 0,
+    CORRECT_REWARD = 5,
+    INCORRECT_PENALTY = 5;
 var socket;
 var teammateColour;
 var isHosting;
@@ -149,8 +152,6 @@ var main = {
         game.teammate = new Teammate();
         game.satisfaction = 100;
         game.finalX = game.world.width - 100;
-        game.CORRECT_REWARD = 5;
-        game.INCORRECT_PENALTY = 5;
 
         game.ordersGroup = game.add.group();
         game.burgerGroup = game.add.group();
@@ -189,7 +190,7 @@ var main = {
         }
         game.interface.updateDispenserPosition(dt, newX, nextX);
         if (!debugMode) {
-            game.satisfaction = Math.max(0, game.satisfaction - dt * 5);
+            game.satisfaction = Math.max(0, game.satisfaction - dt * SATISFACTION_RATE);
         } else {
             if (Math.random() > 0.995) {
                 this.addNewOrder();
@@ -260,10 +261,10 @@ var main = {
         var frontPlate = game.plates.shift();
         if (firstBurgerOrder.checkBurger(frontBurger)) {
             console.log("You got it right!");
-            game.satisfaction = Math.min(100, game.satisfaction + game.CORRECT_REWARD);
+            game.satisfaction = Math.min(100, game.satisfaction + CORRECT_REWARD);
         } else {
             console.log("You got it wrong!");
-            game.satisfaction = Math.min(100, game.satisfaction - game.INCORRECT_PENALTY);
+            game.satisfaction = Math.min(100, game.satisfaction - INCORRECT_PENALTY);
         }
         frontBurger.destroy();
         firstBurgerOrder.destroy();

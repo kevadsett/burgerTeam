@@ -12,6 +12,11 @@ var gameSize = {
     height: 600
 };
 
+var SATISFACTION_RATE = 0,
+    CORRECT_REWARD = 5,
+    INCORRECT_PENALTY = 5,
+    INGREDIENT_COUNT = 4;
+
 var Game = function(players) {
     players[0].colour = Math.random > 0.5 ? 'red' : 'blue';
     players[1].colour = players[0].colour === 'red' ? 'blue' : 'red';
@@ -66,7 +71,7 @@ Game.prototype = {
     },
     startGame: function() {
         this.gameOver = false;
-        this.speed = 10;
+        this.speed = 50;
         this.difficulty = 1;
         this.orders = [];
         this.platePositions = [];
@@ -77,6 +82,7 @@ Game.prototype = {
     },
     onNewBit: function(player, type) {
         console.log(LOCATION, "Adding new " + type + " bit.");
+        console.log("blue: " + !!this.players.blue, "red: " + !!this.players.red);
         this.burgers[this.burgers.length - 1].addBit(type);
         this.players[player.colour === 'red' ? 'blue' : 'red'].emit('teammatePressed');
     },
@@ -85,10 +91,10 @@ Game.prototype = {
         var burgerCorrect = BurgerSpec.checkBurger(spec, burger);
         if (burgerCorrect) {
             console.log("You got it right");
-            this.satisfaction = Math.min(100, this.satisfaction + 5);
+            this.satisfaction = Math.min(100, this.satisfaction + CORRECT_REWARD);
         } else {
             console.log("You got it wrong");
-            this.satisfaction = Math.max(0, this.satisfaction - 5);
+            this.satisfaction = Math.max(0, this.satisfaction - INCORRECT_PENALTY);
         }
         this.popOrder();
         this.randomiseIngredients();
@@ -101,7 +107,7 @@ Game.prototype = {
     randomiseIngredients: function() {
         var blueIngredients = [],
             redIngredients = [];
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < INGREDIENT_COUNT; i++) {
             if (Math.random() > 0.5) {
                 blueIngredients.push(i);
             } else {
@@ -112,13 +118,14 @@ Game.prototype = {
         this.players.red.emit('ingredientsSet', redIngredients);
     },
     update: function(dt) {
+        console.log("blue: " + !!this.players.blue, "red: " + !!this.players.red);
         if (/*Math.random() > 0.99 && */this.orders.length < 1) {
             this.newOrder();
         }
         for (var i = 0; i < this.burgers.length; i++) {
             this.burgers[i].update(dt, this.speed);
         }
-        this.satisfaction = Math.max(0, this.satisfaction - dt * 5);
+        this.satisfaction = Math.max(0, this.satisfaction - dt * SATISFACTION_RATE);
 
         if (this.satisfaction === 0) {
             this.gameOver = true;
