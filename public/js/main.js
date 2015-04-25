@@ -30,6 +30,20 @@ function setupSocketEvents() {
     socket.on('ingredientsSet', function setIngredientInterface(ingredients) {
         events.emit('ingredientsSet', ingredients);
     });
+    if (!debugMode) {
+        socket.on('updateLoop', function(data) {
+            events.emit('serverUpdate', data);
+        });
+    }
+    socket.on('gameReady', function() {
+        events.emit('gameReady');
+    });
+    socket.on('noGameError', function() {
+        events.emit('noGameError');
+    });
+    socket.on('passcodeGenerated', function(passcode) {
+        events.emit('passcodeGenerated', passcode);
+    });
 }
 var setup = {
     preload: function() {
@@ -86,10 +100,10 @@ var joinGame = {
     create: function() {
         var passcode = window.prompt('enter passcode:');
         setStatusText('Please wait, joining game.');
-        socket.on('gameReady', function() {
+        events.on('gameReady', function() {
             game.state.start('main');
         });
-        socket.on('noGameError', function() {
+        events.on('noGameError', function() {
             setStatusText('No such game');
             var tryAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'tryAgainButton', onJoinGame);
             tryAgainButton.anchor.setTo(0.5, 0.5);
@@ -100,7 +114,7 @@ var joinGame = {
 
 var hostGame = {
     create: function() {
-        socket.on('passcodeGenerated', function(passcode) {
+        events.on('passcodeGenerated', function(passcode) {
             setStatusText("Game passcode: " + passcode + "\nGive this code to the second player to begin");
         });
         socket.emit('hostGame');
@@ -165,7 +179,7 @@ var main = {
         console.log("Emitting ready signal");
         if (!debugMode) {
             socket.emit('playerReady');
-            socket.on('updateLoop', this.serverUpdate.bind(this));
+            events.on('serverUpdate', this.serverUpdate, this);
         }
         events.on('addBit', this.addBit, this);
         events.on('submitOrder', this.submitOrder, this);
