@@ -228,11 +228,16 @@ var main = {
             }
         }
 
-        for (i = 0; i < game.orders.length && data.orders[i]; i++) {
-            game.orders[i].updateBits(data.orders[i]);
+        for (i = 0; i < game.orders.length; i++) {
+            if (!game.plates[i].beingSubmitted && JSON.stringify(game.orders[i].specification) !== JSON.stringify(data.orders[i])) {
+                game.orders[i].updateBits(data.orders[i]);
+            }
         }
         if (game.orders.length > data.orders.length) {
-            game.orders.splice(data.orders.length);
+            var deletedOrders = game.orders.splice(data.orders.length);
+            for (var j = 0; j < deletedOrders.length; j++) {
+                deletedOrders[j].destroy();
+            }
         } else {
             while (i < data.orders.length) {
                 game.orders.push(new BurgerOrder(data.orders[i]));
