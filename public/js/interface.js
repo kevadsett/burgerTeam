@@ -9,8 +9,8 @@ var Interface = function() {
         this.buttons.add(button);
     }
     game.add.button(840, 400, 'goButton', this.onSubmitPressed, this);
-    // this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
-    // this.satisfactionMeter.anchor.setTo(0, 0.5);
+    this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
+    this.satisfactionMeter.anchor.setTo(0, 0.5);
 };
 
 Interface.preload = function() {
@@ -45,7 +45,7 @@ Interface.prototype = {
         }
     },
     updateSatisfaction: function(newSatisfaction) {
-        // this.satisfactionMeter.scale.setTo(newSatisfaction / 100, 1);
+        this.satisfactionMeter.scale.setTo(newSatisfaction / 100, 1);
     },
     playSubmitAnimation: function(callback, context) {
         this.dispenser.playSubmitAnim(callback, context);
