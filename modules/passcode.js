@@ -1,40 +1,32 @@
 var connectedUsers = {};
 var pcAdjectives = [
-    "giant",
-    "tiny",
-    "beautiful",
+    "big",
+    "red",
+    "blue",
+    "tall",
+    "thin",
+    "fat",
+    "short",
     "ugly",
-    "edible",
-    "gross",
-    "meaningful",
-    "meaningless",
-    "breakable",
-    "tough",
-    "mathmatical",
-    "grammatical",
-    "woolen",
-    "wooden",
-    "old",
-    "new",
-    "gorgeous"
+    "fit",
+    "fast",
+    "slow",
+    "real",
+    "fake",
+    "daft"
 ];
 var pcNouns = [
-    "puzzle",
-    "monkey",
     "boat",
     "car",
-    "shoes",
+    "shoe",
     "house",
-    "trousers",
     "trout",
-    "hedgehog",
-    "burger",
-    "buns",
-    "fireplace",
-    "table",
+    "bun",
     "tv",
     "hair",
     "shop",
+    "boss",
+    "punk"
 ];
 
 var potentialPasscodes = [];
