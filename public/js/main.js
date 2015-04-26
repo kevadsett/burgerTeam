@@ -89,6 +89,7 @@ var setup = {
 
 var newGame = {
     create: function() {
+        events.off();
         myColour = null;
         teammateColour = null;
         if (playerDisconnected) {
@@ -144,6 +145,7 @@ var disconnected = {
 
 var gameOver = {
     create: function() {
+        events.off();
         var message = "You're fired!";
         var quitButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'quitButton', this.onQuit);
             quitButton.anchor.setTo(0.5, 0.5);
@@ -170,7 +172,6 @@ var main = {
         game.load.spritesheet('teammate', filename, 358, 477);
     },
     create: function() {
-        events.off();
         game.speed = 10;
         game.difficulty = 1;
         game.strikes = 0;
@@ -293,6 +294,7 @@ var main = {
         game.burgers.push(new Burger(game.plates[game.plates.length - 1].position));
     },
     submitOrder: function() {
+        if (!game.orders[0]) return;
         if (!debugMode) {
             emit('submitOrder', {
                 // TODO: Shouldn't need targetSpec here
