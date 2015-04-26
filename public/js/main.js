@@ -3,6 +3,7 @@ var SATISFACTION_RATE = 0,
     CORRECT_REWARD = 5,
     INCORRECT_PENALTY = 5;
 var socket;
+var myColour;
 var teammateColour;
 var isHosting;
 var playerDisconnected = false;
@@ -20,9 +21,10 @@ function setupSocketEvents() {
     socket.on('playerLeft', function onPlayerLeft() {
         game.state.start('disconnected');
     });
-    socket.on('gameStarted', function waitForReadyPlayers(colour, hosting) {
-        teammateColour = colour;
-        isHosting = hosting;
+    socket.on('gameStarted', function waitForReadyPlayers(details) {
+        myColour = details.colour;
+        teammateColour = myColour === 'red' ? 'blue' : 'red';
+        isHosting = details.isHost;
         console.log('Both players in lobby, waiting for ready signals');
         setStatusText('Connecting to other player');
         game.state.start('main');
@@ -44,7 +46,15 @@ function setupSocketEvents() {
     socket.on('passcodeGenerated', function(passcode) {
         events.emit('passcodeGenerated', passcode);
     });
+    socket.on('showGoButton', function(show) {
+        events.emit('showGoButton', show);
+    });
 }
+
+function emit(name, details) {
+    socket.emit(name, myColour || socket.id, details);
+}
+
 var setup = {
     preload: function() {
         Interface.preload();
@@ -79,6 +89,8 @@ var setup = {
 
 var newGame = {
     create: function() {
+        myColour = null;
+        teammateColour = null;
         if (playerDisconnected) {
             playerDisconnected = false;
             setStatusText('Other player was disconnected');
@@ -105,10 +117,12 @@ var joinGame = {
         });
         events.on('noGameError', function() {
             setStatusText('No such game');
-            var tryAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'tryAgainButton', onJoinGame);
+            var tryAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'tryAgainButton', function() {
+                game.state.start('newGame');
+            });
             tryAgainButton.anchor.setTo(0.5, 0.5);
         });
-        socket.emit('joinGame', passcode);
+        emit('joinGame', passcode);
     }
 };
 
@@ -117,7 +131,7 @@ var hostGame = {
         events.on('passcodeGenerated', function(passcode) {
             setStatusText("Game passcode: " + passcode + "\nGive this code to the second player to begin");
         });
-        socket.emit('hostGame');
+        emit('hostGame');
     }
 };
 
@@ -142,10 +156,10 @@ var gameOver = {
         setStatusText(message);
     },
     onPlayAgain: function() {
-        socket.emit('playAgain');
+        emit('playAgain');
     },
     onQuit: function() {
-        socket.emit('quit');
+        emit('quit');
         game.state.start('newGame');
     }
 };
@@ -157,7 +171,7 @@ var main = {
     },
     create: function() {
         events.off();
-        game.speed = 50;
+        game.speed = 10;
         game.difficulty = 1;
         game.strikes = 0;
         game.orders = [];
@@ -168,7 +182,7 @@ var main = {
         game.finalX = game.world.width - 100;
 
         game.ordersGroup = game.add.group();
-        game.burgerGroup = game.add.group();
+        game.burgersGroup = game.add.group();
         game.interface = new Interface();
 
         if (debugMode) {
@@ -178,7 +192,7 @@ var main = {
 
         console.log("Emitting ready signal");
         if (!debugMode) {
-            socket.emit('playerReady');
+            emit('playerReady');
             events.on('serverUpdate', this.serverUpdate, this);
         }
         events.on('addBit', this.addBit, this);
@@ -206,24 +220,26 @@ var main = {
         if (!debugMode) {
             game.satisfaction = Math.max(0, game.satisfaction - dt * SATISFACTION_RATE);
         } else {
-            if (Math.random() > 0.995) {
+            this.timer++;
+            if (!(this.timer % 600)) {
                 this.addNewOrder();
             }
         }
         game.interface.updateSatisfaction(game.satisfaction);
     },
+    timer: 0,
     serverUpdate: function(data) {
         if (data.gameOver) {
             return game.state.start('gameOver');
         }
         var i;
         for (i = 0; i < game.plates.length; i++) {
-            game.plates[i].position.x = data.platePositions[i].x;
-            game.plates[i].position.y = data.platePositions[i].y;
+            game.plates[i].position.x = data.plates[i].position.x;
+            game.plates[i].position.y = data.plates[i].position.y;
         }
-        if (i < data.platePositions.length) {
-            while (i < data.platePositions.length) {
-                game.plates.push(new Plate(game.speed));
+        if (i < data.plates.length) {
+            while (i < data.plates.length) {
+                game.plates.push(new Plate());
                 i++;
             }
         }
@@ -245,31 +261,44 @@ var main = {
             }
         }
         for (i = 0; i < game.burgers.length; i++) {
-            game.burgers[i].updateBits(data.burgers[i].bits);
+            var gameBurger = game.burgers[i],
+                burgerSpec = gameBurger.specification,
+                serverSpec = data.burgers[i].specification;
+            if (JSON.stringify(burgerSpec) !== JSON.stringify(serverSpec)) {
+                if (burgerSpec.length > serverSpec.length) {
+                    gameBurger.replaceBits(serverSpec);
+                } else {
+                    gameBurger.addNewBits(serverSpec);
+                }
+            }
         }
         while (i < data.burgers.length) {
-            game.burgers.push(new Burger(game.plates[i].position, i, data.burgers[i].bits));
+            game.burgers.push(new Burger(game.plates[i].position, data.burgers[i].specification));
             i++;
         }
         game.strikes = data.strikes;
         game.speed = data.speed;
         game.satisfaction = data.satisfaction;
     },
-    addBit: function(index) {
-        game.burgers[0].addBit(index);
-        console.log(index);
+    addBit: function(type) {
+        game.burgers[0].addBit(type);
+        console.log(type);
         if (!debugMode) {
-            socket.emit('newBit', index);
+            emit('newBit', type);
         }
     },
     addNewOrder: function() {
         game.orders.push(new BurgerOrder([Burger.BUN_BOTTOM, Burger.PATTY, Burger.LETTUCE, Burger.BUN_TOP]));
-        game.plates.push(new Plate(game.speed));
+        game.plates.push(new Plate());
         game.burgers.push(new Burger(game.plates[game.plates.length - 1].position));
     },
     submitOrder: function() {
         if (!debugMode) {
-            socket.emit('submitOrder', game.orders[0].specification, game.burgers[0].getSpec());
+            emit('submitOrder', {
+                // TODO: Shouldn't need targetSpec here
+                targetSpec: game.orders[0].specification,
+                burgerSpec: game.burgers[0].specification
+            });
         }
         game.plates[0].beingSubmitted = true;
         game.interface.playSubmitAnimation();

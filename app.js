@@ -16,8 +16,10 @@ app.get('/', function(req, res) {
 });
 
 io.on('connection', function(socket) {
+    console.log("----- USER CONNECTED: " + socket.id + " -----");
     LobbyManager.connect(socket);
     socket.on('disconnect', function() {
+        console.log("----- USER DISCONNECTED: " + socket.id + " -----");
         LobbyManager.disconnect(socket);
     });
 });

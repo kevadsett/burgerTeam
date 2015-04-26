@@ -29,9 +29,9 @@ BurgerOrder.preload = function() {
 
 BurgerOrder.prototype = {
     checkBurger: function(burger) {
-        var isCorrect = burger.bits.length === this.specification.length;
-        for (var i = 0; i < burger.bits.length && isCorrect; i++) {
-            isCorrect = this.specification[i] === burger.bits[i].type;
+        var isCorrect = burger.specification.length === this.specification.length;
+        for (var i = 0; i < burger.specification.length && isCorrect; i++) {
+            isCorrect = this.specification[i] === burger.specification[i];
         }
         return isCorrect;
     },

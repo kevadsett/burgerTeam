@@ -1,13 +1,16 @@
-var BurgerBit = function(x, y, frame, group) {
-    this.sprite = game.add.sprite(x, 0, 'ingredients', frame);
+var BurgerBit = function(yOffset, frame, group) {
+    this.sprite = game.add.sprite(0, -game.world.height / 2, 'ingredients', frame);
     group.add(this.sprite);
-    game.add.tween(this.sprite).to({y: y}, 125).start();
+    var y = (yOffset * BurgerBit.SPRITE_SIZE.height / 2);
+    game.add.tween(this.sprite).to({y: -y}, 125).start();
     this.sprite.anchor.setTo(0.5, 0.5);
     this.type = frame;
 };
 
+BurgerBit.SPRITE_SIZE = { width: 171, height: 66 };
+
 BurgerBit.preload = function() {
-    game.load.spritesheet('ingredients', 'images/ingredients.png', 171, 66);
+    game.load.spritesheet('ingredients', 'images/ingredients.png', BurgerBit.SPRITE_SIZE.width, BurgerBit.SPRITE_SIZE.height);
 };
 
 BurgerBit.prototype = {

@@ -1,5 +1,4 @@
-var Plate = function(speed) {
-    this.speed = speed;
+var Plate = function() {
     this.position = {
         x: 0,
         y: game.world.height / 2
@@ -15,7 +14,7 @@ Plate.preload = function() {
 Plate.prototype = {
     update: function(dt) {
         if (!this.beingSubmitted) {
-            this.position.x += dt * this.speed;
+            this.position.x += dt * game.speed;
             this.sprite.x = this.position.x;
             if (this.position.x > game.finalX) {
                 events.emit('submitOrder');

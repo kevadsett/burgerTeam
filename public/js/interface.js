@@ -1,5 +1,6 @@
 var Interface = function() {
     events.on('ingredientsSet', this.onIngredientsSet, this);
+    events.on('showGoButton', this.showGoButton, this);
     game.add.sprite(0, 358, 'console');
     this.dispenser = new Dispenser();
     this.buttons = game.add.group();
@@ -8,7 +9,7 @@ var Interface = function() {
         var button = game.add.button(50 + (i * 150), 393, 'ingredientButton', this.onIngredientSelected, this, 0, 0, 1, 0);
         this.buttons.add(button);
     }
-    game.add.button(840, 400, 'goButton', this.onSubmitPressed, this);
+    this.goButton = game.add.button(840, 400, 'goButton', this.onSubmitPressed, this);
     this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
     this.satisfactionMeter.anchor.setTo(0, 0.5);
 };
@@ -49,5 +50,8 @@ Interface.prototype = {
     },
     playSubmitAnimation: function(callback, context) {
         this.dispenser.playSubmitAnim(callback, context);
+    },
+    showGoButton: function(show) {
+        this.goButton.visible = show;
     }
 };

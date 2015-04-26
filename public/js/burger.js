@@ -1,10 +1,12 @@
-var Burger = function(position, plateIndex, bits) {
-    this.bits = bits || [];
-    this.bitGroup = game.add.group();
-    game.burgerGroup.add(this.bitGroup);
-    this.plateIndex = plateIndex;
-    this.sliceIndex = 0;
+var Burger = function(position, spec) {
+    this.bitGroup = game.add.group(game.burgersGroup);
+    this.bitGroup.x = 0;
+    this.bitGroup.y = game.world.height / 2;
     this.position = position;
+    this.specification = spec || [];
+    if (spec) {
+        this.addNewBits(spec);
+    }
 };
 
 Burger.BUN_BOTTOM = 0;
@@ -14,42 +16,26 @@ Burger.LETTUCE = 3;
 
 Burger.prototype = {
     update: function() {
-        for (var i = 0; i < this.bits.length; i++) {
-            this.bits[i].update(this.position.x);
+        this.bitGroup.x = this.position.x;
+    },
+    addBits: function(fromIndex, spec) {
+        for (var i = fromIndex; i < spec.length; i++) {
+            this.addBit(spec[i]);
         }
     },
-    updateBits: function(newBits) {
-        if (newBits.length === 0) {
-            return this.destroy();
-        }
-        for (var i = 0; i < this.bits.length; i++) {
-            this.bits[i].updateData(newBits[i]);
-        }
-        if (i < newBits.length) {
-            while (i < newBits.length) {
-                this.bits.push(new BurgerBit(newBits[i].x, newBits[i].y, newBits[i].type, this.bitGroup));
-                i++;
-            }
-        }
-        this.sliceIndex = i;
+    replaceBits: function(spec) {
+        this.bitGroup.removeAll();
+        this.specification = [];
+        this.addBits(0, spec);
+    },
+    addNewBits: function(spec) {
+        this.addBits(this.specification.length, spec);
     },
     addBit: function(type) {
-        var bitX = this.position.x;
-        var bitY = this.position.y - (this.sliceIndex * 32);
-        this.bits.push(new BurgerBit(bitX, bitY, type, this.bitGroup));
-        this.sliceIndex++;
+        new BurgerBit(this.specification.length, type, this.bitGroup);
+        this.specification.push(type);
     },
     destroy: function() {
-        for (var i = 0; i < this.bits.length; i++) {
-            this.bits[i].destroy();
-        }
-        this.bits = [];
-    },
-    getSpec: function() {
-        var spec = [];
-        for (var i = 0; i < this.bits.length; i++) {
-            spec.push(this.bits[i].type);
-        }
-        return spec;
+        this.bitGroup.destroy();
     }
 };

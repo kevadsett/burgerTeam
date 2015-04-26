@@ -1,23 +1,26 @@
 var Passcode = require('../modules/passcode');
-var GameManager = require('../modules/gameManager');
+var Game = require('../modules/game');
 var LOCATION = "LOBBY::";
 
 var users = {};
 var hosts = {};
 var games = {};
 
-function hostGame(user) {
+function hostGame(userId) {
+    var user = users[userId];
     user.isHost = true;
     var gamePasscode = Passcode.generate();
     hosts[gamePasscode] = user;
+    console.log(LOCATION, userId + " generated '" + gamePasscode + "' lobby.");
     user.emit('passcodeGenerated', gamePasscode);
 }
 
-function joinGame(user, passcode) {
-    console.log(LOCATION, "Join game: " + passcode);
+function joinGame(userId, passcode) {
+    var user = users[userId];
+    console.log(LOCATION, userId + " is joining game: " + passcode);
     if (hosts[passcode]) {
         user.isHost = false;
-        games[passcode] = GameManager.create([hosts[passcode], user]);
+        games[passcode] = new Game([hosts[passcode], user], passcode);
     } else {
         user.emit('noGameError');
     }
@@ -26,13 +29,13 @@ function joinGame(user, passcode) {
 module.exports = {
     connect: function(user) {
         users[user.id] = user;
-        user.on('hostGame', hostGame.bind(this, user));
-        user.on('joinGame', joinGame.bind(this, user));
+        user.on('hostGame', hostGame);
+        user.on('joinGame', joinGame);
     },
     disconnect: function(user) {
         delete users[user.id];
-        if (user.game) {
-            user.game.destroy(user);
+        if (user.gameCode) {
+            games[user.gameCode].destroy(user);
         }
     }
 };
