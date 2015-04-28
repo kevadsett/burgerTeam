@@ -10,7 +10,9 @@ module.exports = function(users, passcode) {
     var SATISFACTION_RATE = 0,
         CORRECT_REWARD = 5,
         INCORRECT_PENALTY = 5,
-        INGREDIENT_COUNT = 4;
+        INGREDIENT_COUNT = 4,
+        SPEED_INCREASE_AMOUNT = 0.05,
+        DIFFICULTY_INTERVAL = 5;
 
     var players = {},
         gameOver,
@@ -20,7 +22,8 @@ module.exports = function(users, passcode) {
         plates,
         burgers,
         satisfaction,
-        loop ;
+        loop,
+        correctOrders;
 
     console.log(LOCATION, "New game with users:", users.length);
     users[0].colour = Math.random > 0.5 ? 'red' : 'blue';
@@ -31,8 +34,6 @@ module.exports = function(users, passcode) {
     players.blue.gameCode = passcode;
     players.red.gameCode = passcode;
 
-    console.log(LOCATION, "Blue player: " + players.blue.id);
-    console.log(LOCATION, "Red player: " + players.red.id);
     for (var colour in players) {
         var player = players[colour];
         console.log(LOCATION, "Listening to " + colour + " player (" + player.id + ") for ready event");
@@ -80,6 +81,7 @@ module.exports = function(users, passcode) {
         burgers = [];
         satisfaction = 100;
         loop = gameLoop.setGameLoop(update, 1000 / 10);
+        correctOrders = 0;
         randomiseIngredients();
         randomiseGoButton();
     }
@@ -98,6 +100,11 @@ module.exports = function(users, passcode) {
         if (burgerCorrect) {
             console.log("You got it right");
             satisfaction = Math.min(100, satisfaction + CORRECT_REWARD);
+            speed += SPEED_INCREASE_AMOUNT;
+            correctOrders++;
+            if (correctOrders % DIFFICULTY_INTERVAL) {
+                difficulty++;
+            }
         } else {
             console.log("You got it wrong");
             satisfaction = Math.max(0, satisfaction - INCORRECT_PENALTY);
