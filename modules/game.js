@@ -123,13 +123,20 @@ module.exports = function(users, passcode) {
     function randomiseIngredients() {
         var blueIngredients = [],
             redIngredients = [];
-        for (var i = 0; i < INGREDIENT_COUNT; i++) {
-            if (Math.random() > 0.5) {
-                blueIngredients.push(i);
-            } else {
-                redIngredients.push(i);
+        var latestOrder = orders[0];
+        console.log(LOCATION, "Latest order:", latestOrder);
+        if (latestOrder) {
+            var ingredientsUsed = BurgerSpec.getIngredientList(latestOrder);
+            console.log(LOCATION, "ingredientsUsed:", ingredientsUsed);
+            for (var i = 0; i < ingredientsUsed.length; i++) {
+                if (Math.random() > 0.5) {
+                    blueIngredients.push(ingredientsUsed[i]);
+                } else {
+                    redIngredients.push(ingredientsUsed[i]);
+                }
             }
         }
+        // TODO: ensure all necessary ingredients have been set
         debugPrintPlayers();
         emitTo('blue', 'ingredientsSet', blueIngredients);
         emitTo('red', 'ingredientsSet', redIngredients);
@@ -144,6 +151,7 @@ module.exports = function(users, passcode) {
     function update(dt) {
         if (/*Math.random() > 0.99 && */orders.length < 1) {
             newOrder();
+            randomiseIngredients();
         }
         for (var i = 0; i < plates.length; i++) {
             plates[i].update(dt, speed);
