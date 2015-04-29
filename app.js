@@ -29,13 +29,3 @@ io.on('connection', function(socket) {
 http.listen(process.env.PORT || 5000, function() {
     console.log('listening on ' + (process.env.PORT || 5000));
 });
-
-for (var i = 0; i < 25; i++) {
-	if (i % 3 === 0) {
-		BurgerSpec.addIngredientChoice();
-	}
-	for (var j = 0; j < 3; j++) {
-		var burger = BurgerSpec.create(i);
-		console.log("burger:", burger);
-	}
-}
