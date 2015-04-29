@@ -1,11 +1,15 @@
 var Interface = function() {
+    var i;
+    this.secondsPerFrame = 1 / game.speed;
+    this.animDt = 0;
     events.on('ingredientsSet', this.onIngredientsSet, this);
     events.on('showGoButton', this.showGoButton, this);
     game.add.sprite(0, 0, 'bg');
     this.dispenser = new Dispenser();
     this.icons = game.add.group();
     this.buttons = game.add.group();
-    for (var i = 0; i < 9; i++) {
+    this.conveyor = game.add.group();
+    for (i = 0; i < 9; i++) {
         var button = game.add.button((i * 101), 420, 'ingredientButton', this.onIngredientSelected, this, 0, 0, 1, 0);
         this.buttons.add(button);
         var icon = game.add.sprite((i * 101), 420, 'ingredientIcons', 12);
@@ -14,12 +18,17 @@ var Interface = function() {
     this.goButton = game.add.button(940, 440, 'goButton', this.onSubmitPressed, this, 0, 0, 1, 0);
     this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
     this.satisfactionMeter.anchor.setTo(0, 0.5);
+    for (i = 0; i < 5; i++) {
+        var conveyorWheel = game.add.sprite(85 + (i * 201), 394, 'conveyor', Math.floor(Math.random() * 17));
+        this.conveyor.add(conveyorWheel);
+    }
 };
 
 Interface.preload = function() {
     game.load.spritesheet('ingredientButton', 'images/foodselectbtns.png', 101, 131);
     game.load.spritesheet('ingredientIcons', 'images/foodselect.png', 101, 131);
     game.load.spritesheet('goButton', 'images/orderreadybtn.png', 82, 81);
+    game.load.spritesheet('conveyor', 'images/conveyoranim180.png', 32, 32);
     game.load.image('bg', 'images/bg.png');
     Dispenser.preload();
 };
@@ -27,6 +36,14 @@ Interface.preload = function() {
 Interface.prototype = {
     updateDispenserPosition: function(dt, newX, nextX) {
         this.dispenser.updatePosition(dt, newX, nextX);
+        this.animDt += dt;
+        if (this.animDt > this.secondsPerFrame) {
+            this.animDt -= this.animDt;
+            for (var i = 0; i < this.conveyor.children.length; i++) {
+                var wheel = this.conveyor.getChildAt(i);
+                wheel.frame = (wheel.frame + 1) % 17;
+            }
+        }
     },
     onIngredientSelected: function(button) {
         this.dispenser.playDispenseAnim();

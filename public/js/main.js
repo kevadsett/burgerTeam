@@ -217,7 +217,7 @@ var main = {
         var newX = 0, nextX = 0;
         if (game.plates[0] && game.plates[0].position) {
             newX =  game.plates[0].position.x;
-            nextX = game.plates[0].position.x + (dt * game.plates[0].speed);
+            nextX = game.plates[0].position.x + (dt * game.speed);
         }
         game.interface.updateDispenserPosition(dt, newX, nextX);
         if (!debugMode) {
