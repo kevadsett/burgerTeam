@@ -189,7 +189,7 @@ var main = {
         game.ordersGroup = game.add.group();
 
         if (debugMode) {
-            events.emit('ingredientsSet', [Burger.BUN_BOTTOM, Burger.PATTY, Burger.LETTUCE, Burger.BUN_TOP]);
+            events.emit('ingredientsSet', [0,1,2,3,4,5,6,7,11]);
             this.addNewOrder();
         }
 
