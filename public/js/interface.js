@@ -61,7 +61,7 @@ Interface.prototype = {
         }
     },
     updateSatisfaction: function(newSatisfaction) {
-        this.satisfactionMeter.scale.setTo(newSatisfaction / 100, 1);
+        // this.satisfactionMeter.scale.setTo(newSatisfaction / 100, 1);
     },
     playSubmitAnimation: function(callback, context) {
         this.dispenser.playSubmitAnim(callback, context);
