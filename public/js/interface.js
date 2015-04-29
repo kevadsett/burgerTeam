@@ -64,9 +64,11 @@ Interface.prototype = {
             this.buttons.getChildAt(i).frame = 0;
             usedButtonCount++;
         }
+        console.log("Used buttons: " + usedButtonCount);
         while (usedButtonCount < 9) {
             var icon = this.icons.getChildAt(usedButtonCount);
-            icon.frame = [INGREDIENT_COUNT];
+            icon.frame = INGREDIENT_COUNT;
+            console.log("clearing " + usedButtonCount, icon.frame);
             this.buttons.getChildAt(usedButtonCount).ingredient = -1;
             this.buttons.getChildAt(usedButtonCount).input.enabled = false;
             this.buttons.getChildAt(usedButtonCount).frame = 2;
