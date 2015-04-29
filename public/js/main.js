@@ -1,7 +1,8 @@
 var debugMode = false;
 var SATISFACTION_RATE = 0,
     CORRECT_REWARD = 5,
-    INCORRECT_PENALTY = 5;
+    INCORRECT_PENALTY = 5,
+    INGREDIENT_COUNT = 12;
 var socket;
 var myColour;
 var teammateNumber;

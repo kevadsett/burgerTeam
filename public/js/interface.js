@@ -53,11 +53,24 @@ Interface.prototype = {
         events.emit('submitOrder');
     },
     onIngredientsSet: function(ingredients) {
+        console.log("Ingredients received:", ingredients);
+        var usedButtonCount = 0;
         for (var i = 0; i < ingredients.length; i++) {
             if (this.icons.children[i]) {
                 this.icons.getChildAt(i).frame = ingredients[i];
             }
             this.buttons.getChildAt(i).ingredient = ingredients[i];
+            this.buttons.getChildAt(i).input.enabled = true;
+            this.buttons.getChildAt(i).frame = 0;
+            usedButtonCount++;
+        }
+        while (usedButtonCount < 9) {
+            var icon = this.icons.getChildAt(usedButtonCount);
+            icon.frame = [INGREDIENT_COUNT];
+            this.buttons.getChildAt(usedButtonCount).ingredient = -1;
+            this.buttons.getChildAt(usedButtonCount).input.enabled = false;
+            this.buttons.getChildAt(usedButtonCount).frame = 2;
+            usedButtonCount++;
         }
     },
     updateSatisfaction: function(newSatisfaction) {
