@@ -10,7 +10,7 @@ module.exports = function(users, passcode) {
     var SATISFACTION_RATE = 0,
         CORRECT_REWARD = 5,
         INCORRECT_PENALTY = 5,
-        INGREDIENT_COUNT = 4,
+        INGREDIENT_COUNT = 12,
         SPEED_INCREASE_AMOUNT = 0.05,
         DIFFICULTY_INTERVAL = 5;
 
@@ -126,21 +126,21 @@ module.exports = function(users, passcode) {
 
     function randomiseIngredients() {
         var blueIngredients = [],
-            redIngredients = [];
-        var latestOrder = orders[0];
-        console.log(LOCATION, "Latest order:", latestOrder);
-        if (latestOrder) {
-            var ingredientsUsed = BurgerSpec.getIngredientList(latestOrder);
-            console.log(LOCATION, "ingredientsUsed:", ingredientsUsed);
-            for (var i = 0; i < ingredientsUsed.length; i++) {
-                if (Math.random() > 0.5) {
-                    blueIngredients.push(ingredientsUsed[i]);
-                } else {
-                    redIngredients.push(ingredientsUsed[i]);
-                }
+            redIngredients = [],
+            randomIngredients = [],
+            possibleIngredients = [0,1,2,3,4,5,6,7,8,9,10,11],
+            i;
+        while (possibleIngredients.length) {
+            randomIngredients.push(possibleIngredients.splice(Math.floor(Math.random() * possibleIngredients.length), 1)[0]);
+        }
+        console.log(LOCATION, "randomIngredients:", randomIngredients);
+        for (i = 0; i < randomIngredients.length; i++) {
+            if (Math.random() > 0.5 && blueIngredients.length < 9) {
+                blueIngredients.push(randomIngredients[i]);
+            } else {
+                redIngredients.push(randomIngredients[i]);
             }
         }
-        // TODO: ensure all necessary ingredients have been set
         debugPrintPlayers();
         emitTo('blue', 'ingredientsSet', blueIngredients);
         emitTo('red', 'ingredientsSet', redIngredients);
@@ -153,9 +153,11 @@ module.exports = function(users, passcode) {
     }
 
     function update(dt) {
-        if (/*Math.random() > 0.99 && */orders.length < 1) {
+        if (orders.length < 1) {
             newOrder();
             randomiseIngredients();
+        } else if (Math.random() > 0.99) {
+            newOrder();
         }
         for (var i = 0; i < plates.length; i++) {
             plates[i].update(dt, speed);
