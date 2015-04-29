@@ -95,9 +95,9 @@ var newGame = {
             playerDisconnected = false;
             setStatusText('Other player was disconnected');
         }
-        var hostButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'hostGameButton', this.onHostGame, 0, 0, 1, 0);
+        var hostButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'hostGameButton', this.onHostGame, 1, 1, 0, 1);
         hostButton.anchor.setTo(0.5, 0.5);
-        var joinButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'joinGameButton', this.onJoinGame, 0, 0, 1, 0);
+        var joinButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'joinGameButton', this.onJoinGame, 1, 1, 0, 1);
         joinButton.anchor.setTo(0.5, 0.5);
     },
     onHostGame: function() {
@@ -119,7 +119,7 @@ var joinGame = {
             setStatusText('No such game');
             var tryAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'tryAgainButton', function() {
                 game.state.start('newGame');
-            }, 0, 0, 1, 0);
+            }, 1, 1, 0, 1);
             tryAgainButton.anchor.setTo(0.5, 0.5);
         });
         emit('joinGame', passcode);
@@ -146,10 +146,10 @@ var gameOver = {
     create: function() {
         events.off();
         var message = "You're fired!";
-        var quitButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'quitButton', this.onQuit, 0, 0, 1, 0);
+        var quitButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'quitButton', this.onQuit, 1, 1, 0, 1);
             quitButton.anchor.setTo(0.5, 0.5);
         if (isHosting) {
-            var playAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'playAgainButton', this.onPlayAgain, 0, 0, 1, 0);
+            var playAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'playAgainButton', this.onPlayAgain, 1, 1, 0, 1);
             playAgainButton.anchor.setTo(0.5, 0.5);
         } else {
             message += "\nWaiting for host.";
