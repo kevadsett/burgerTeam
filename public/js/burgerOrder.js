@@ -39,7 +39,8 @@ BurgerOrder.prototype = {
         console.log(newBits);
         console.log("Resetting bits");
         this.burgerImage.removeAll();
-        var offset = (newBits.length / 2) * SPRITE_HEIGHT;
+        var orderHeight = newBits.length * SPRITE_HEIGHT;
+        this.burgerImage.y = orderHeight - ORDER_BG_HEIGHT + 25;
         for (var i = 0; i < newBits.length; i++) {
             var existingBit = this.burgerImage.children[i] && this.burgerImage.getChildAt(i);
             if (existingBit) {
@@ -47,16 +48,15 @@ BurgerOrder.prototype = {
                 existingBit.frame = newBits[i];
             } else {
                 console.log("Making new " + newBits[i]);
-                var orderIcon = game.add.sprite(0, offset + -(i * SPRITE_HEIGHT), 'orderIcons', newBits[i]);
+                var orderIcon = game.add.sprite(0, 255 - (i * SPRITE_HEIGHT), 'orderIcons', newBits[i]);
                 orderIcon.anchor.setTo(0.5, 0.5);
                 this.burgerImage.add(orderIcon);
             }
         }
         var slip = game.add.sprite(0, 0, 'orderSlip');
-        slip.anchor.setTo(0.5, 0.5);
-        slip.scale.setTo(0.8, 0.8);
+        slip.anchor.setTo(0.5, 0);
         this.burgerImage.addChildAt(slip, 0);
-        this.burgerImage.rotation = (Math.random() * rotateRange) - (rotateRange / 2);
+        // this.burgerImage.rotation = (Math.random() * rotateRange) - (rotateRange / 2);
         this.specification = newBits;
     },
     destroy: function() {
