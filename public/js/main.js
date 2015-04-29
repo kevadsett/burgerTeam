@@ -279,7 +279,6 @@ var main = {
             game.burgers.push(new Burger(game.plates[i].position, data.burgers[i].specification));
             i++;
         }
-        game.strikes = data.strikes;
         game.speed = data.speed;
         game.satisfaction = data.satisfaction;
     },
