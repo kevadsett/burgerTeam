@@ -39,7 +39,7 @@ BurgerOrder.prototype = {
         console.log(newBits);
         console.log("Resetting bits");
         this.burgerImage.removeAll();
-        var offset = (newBits.length / 2) * spriteHeight;
+        var offset = (newBits.length / 2) * SPRITE_HEIGHT;
         for (var i = 0; i < newBits.length; i++) {
             var existingBit = this.burgerImage.children[i] && this.burgerImage.getChildAt(i);
             if (existingBit) {
@@ -47,7 +47,7 @@ BurgerOrder.prototype = {
                 existingBit.frame = newBits[i];
             } else {
                 console.log("Making new " + newBits[i]);
-                var orderIcon = game.add.sprite(0, offset + -(i * spriteHeight), 'orderIcons', newBits[i]);
+                var orderIcon = game.add.sprite(0, offset + -(i * SPRITE_HEIGHT), 'orderIcons', newBits[i]);
                 orderIcon.anchor.setTo(0.5, 0.5);
                 this.burgerImage.add(orderIcon);
             }
