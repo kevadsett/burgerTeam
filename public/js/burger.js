@@ -4,7 +4,7 @@ var Burger = function(position, spec) {
     this.bitGroup.y = game.plates[0].position.y;
     this.position = position;
     this.specification = spec || [];
-    if (spec) {
+    if (spec && spec.length > 0) {
         this.addNewBits(spec);
     }
 };

@@ -1,6 +1,6 @@
-var INGREDIENT_COUNT = 10;
+var INGREDIENT_COUNT = 12;
 var MAX_INGREDIENTS = 10;
-var choiceCount = 0;
+var choiceCount = 1;
 module.exports = {
     create: function(difficulty) {
         var i;
@@ -17,7 +17,7 @@ module.exports = {
             var choiceIndex = Math.floor(Math.random() * choices.length);
             spec.push(choices[choiceIndex]);
         }
-        spec.push(1);
+        spec.push(INGREDIENT_COUNT - 1);
         return spec;
     },
     checkBurger: function(targetSpec, burgerSpec) {
