@@ -181,9 +181,9 @@ var main = {
         game.finalX = game.world.width - 100;
 
         game.interface = new Interface();
+        game.teammate = new Teammate();
         game.plateGroup = game.add.group();
         game.burgersGroup = game.add.group();
-        game.teammate = new Teammate();
         game.dispenserGroup = game.add.group();
         game.dispenserGroup.add(game.interface.dispenser.sprite);
         game.ordersGroup = game.add.group();
