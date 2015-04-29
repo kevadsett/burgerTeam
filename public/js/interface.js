@@ -16,8 +16,8 @@ var Interface = function() {
         this.icons.add(icon);
     }
     this.goButton = game.add.button(940, 440, 'goButton', this.onSubmitPressed, this, 0, 0, 1, 0);
-    this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
-    this.satisfactionMeter.anchor.setTo(0, 0.5);
+    // this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
+    // this.satisfactionMeter.anchor.setTo(0, 0.5);
     for (i = 0; i < 5; i++) {
         var conveyorWheel = game.add.sprite(85 + (i * 201), 394, 'conveyor', Math.floor(Math.random() * 17));
         this.conveyor.add(conveyorWheel);
