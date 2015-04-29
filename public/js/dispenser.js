@@ -5,7 +5,7 @@ var Dispenser = function() {
 };
 
 Dispenser.preload = function() {
-    game.load.image('dispenser', 'images/dispenser.png');
+    game.load.image('dispenser', 'images/toob.png');
 };
 
 Dispenser.prototype = {

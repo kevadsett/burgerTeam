@@ -1,10 +1,10 @@
-var debugMode = false;
+var debugMode = true;
 var SATISFACTION_RATE = 0,
     CORRECT_REWARD = 5,
     INCORRECT_PENALTY = 5;
 var socket;
 var myColour;
-var teammateColour;
+var teammateNumber;
 var isHosting;
 var playerDisconnected = false;
 function setStatusText(text) {
@@ -23,7 +23,7 @@ function setupSocketEvents() {
     });
     socket.on('gameStarted', function waitForReadyPlayers(details) {
         myColour = details.colour;
-        teammateColour = myColour === 'red' ? 'blue' : 'red';
+        teammateNumber = myColour === 'red' ? 1 : 2;
         isHosting = details.isHost;
         console.log('Both players in lobby, waiting for ready signals');
         setStatusText('Connecting to other player');
@@ -61,12 +61,11 @@ var setup = {
         BurgerBit.preload();
         BurgerOrder.preload();
         Plate.preload();
-        game.load.image('satisfaction', 'images/satisfaction.png');
-        game.load.image('hostGameButton', 'images/host.png');
-        game.load.image('joinGameButton', 'images/join.png');
-        game.load.image('tryAgainButton', 'images/tryAgain.png');
-        game.load.image('playAgainButton', 'images/playAgain.png');
-        game.load.image('quitButton', 'images/quit.png');
+        // game.load.image('satisfaction', 'images/satisfaction.png');
+        game.load.spritesheet('hostGameButton', 'images/hostbtn.png', 216, 127);
+        game.load.spritesheet('joinGameButton', 'images/joinbtn.png', 216, 127);
+        game.load.spritesheet('playAgainButton', 'images/playagainbtn.png', 216, 127);
+        // game.load.spritesheet('quitButton', 'images/quitbtn.png');
     },
     create: function() {
         game.stage.backgroundColor = 0xffffff;
@@ -79,7 +78,7 @@ var setup = {
         setupSocketEvents();
 
         if (debugMode) {
-            teammateColour = 'blue';
+            teammateNumber = 2;
             game.state.start('main');
         } else {
             game.state.start('newGame');
@@ -91,14 +90,14 @@ var newGame = {
     create: function() {
         events.off();
         myColour = null;
-        teammateColour = null;
+        teammateNumber = null;
         if (playerDisconnected) {
             playerDisconnected = false;
             setStatusText('Other player was disconnected');
         }
-        var hostButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'hostGameButton', this.onHostGame);
+        var hostButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'hostGameButton', this.onHostGame, 0, 0, 1, 0);
         hostButton.anchor.setTo(0.5, 0.5);
-        var joinButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'joinGameButton', this.onJoinGame);
+        var joinButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'joinGameButton', this.onJoinGame, 0, 0, 1, 0);
         joinButton.anchor.setTo(0.5, 0.5);
     },
     onHostGame: function() {
@@ -120,7 +119,7 @@ var joinGame = {
             setStatusText('No such game');
             var tryAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'tryAgainButton', function() {
                 game.state.start('newGame');
-            });
+            }, 0, 0, 1, 0);
             tryAgainButton.anchor.setTo(0.5, 0.5);
         });
         emit('joinGame', passcode);
@@ -147,10 +146,10 @@ var gameOver = {
     create: function() {
         events.off();
         var message = "You're fired!";
-        var quitButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'quitButton', this.onQuit);
+        var quitButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'quitButton', this.onQuit, 0, 0, 1, 0);
             quitButton.anchor.setTo(0.5, 0.5);
         if (isHosting) {
-            var playAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'playAgainButton', this.onPlayAgain);
+            var playAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'playAgainButton', this.onPlayAgain, 0, 0, 1, 0);
             playAgainButton.anchor.setTo(0.5, 0.5);
         } else {
             message += "\nWaiting for host.";
@@ -167,9 +166,9 @@ var gameOver = {
 };
 var main = {
     preload: function() {
-        var filename = 'images/' + teammateColour + 'Player.png';
+        var filename = 'images/player' + teammateNumber + '.png';
         console.log(filename);
-        game.load.spritesheet('teammate', filename, 358, 477);
+        game.load.spritesheet('teammate', filename, 320, 272);
     },
     create: function() {
         game.speed = 10;
@@ -178,13 +177,16 @@ var main = {
         game.orders = [];
         game.plates = [];
         game.burgers = [];
-        game.teammate = new Teammate();
         game.satisfaction = 100;
         game.finalX = game.world.width - 100;
 
-        game.ordersGroup = game.add.group();
-        game.burgersGroup = game.add.group();
         game.interface = new Interface();
+        game.plateGroup = game.add.group();
+        game.burgersGroup = game.add.group();
+        game.teammate = new Teammate();
+        game.dispenserGroup = game.add.group();
+        game.dispenserGroup.add(game.interface.dispenser.sprite);
+        game.ordersGroup = game.add.group();
 
         if (debugMode) {
             events.emit('ingredientsSet', [Burger.BUN_BOTTOM, Burger.PATTY, Burger.LETTUCE, Burger.BUN_TOP]);
@@ -222,7 +224,7 @@ var main = {
             game.satisfaction = Math.max(0, game.satisfaction - dt * SATISFACTION_RATE);
         } else {
             this.timer++;
-            if (!(this.timer % 600)) {
+            if (!(this.timer % 1000)) {
                 this.addNewOrder();
             }
         }
@@ -289,7 +291,13 @@ var main = {
         }
     },
     addNewOrder: function() {
-        game.orders.push(new BurgerOrder([Burger.BUN_BOTTOM, Burger.PATTY, Burger.LETTUCE, Burger.BUN_TOP]));
+        var newOrder = [Burger.BUN_BOTTOM];
+        var orderLength = Math.ceil(Math.random() * 6);
+        for (var i = 0; i < orderLength; i++) {
+            newOrder.push(Math.floor(Math.random() * 10) + 1);
+        }
+        newOrder.push(Burger.BUN_TOP);
+        game.orders.push(new BurgerOrder(newOrder));
         game.plates.push(new Plate());
         game.burgers.push(new Burger(game.plates[game.plates.length - 1].position));
     },
@@ -297,7 +305,6 @@ var main = {
         if (!game.orders[0]) return;
         if (!debugMode) {
             emit('submitOrder', {
-                // TODO: Shouldn't need targetSpec here
                 targetSpec: game.orders[0].specification,
                 burgerSpec: game.burgers[0].specification
             });

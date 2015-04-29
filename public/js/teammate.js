@@ -1,6 +1,6 @@
 var Teammate = function() {
-    this.sprite = game.add.sprite(game.world.width / 2, game.world.height, 'teammate');
-    this.sprite.anchor.setTo(0.5, 1);
+    this.sprite = game.add.sprite(game.world.width / 2, 100, 'teammate');
+    this.sprite.anchor.setTo(0.5, 0);
     socket.on('teammatePressed', this.animatePress.bind(this));
 };
 

@@ -1,9 +1,10 @@
 var Plate = function() {
     this.position = {
         x: 0,
-        y: game.world.height / 2
+        y: 350
     };
     this.sprite = game.add.sprite(this.position.x, this.position.y, 'plate');
+    game.plateGroup.add(this.sprite);
     this.sprite.anchor.setTo(0.5, 0);
 };
 

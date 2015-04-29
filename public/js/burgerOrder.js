@@ -1,30 +1,30 @@
-var spriteHeight = 18;
-var rotateRange = Math.PI / 3;
+var SPRITE_HEIGHT = 20;
+var ORDER_BG_HEIGHT = 275;
+var rotateRange = Math.PI / 6;
 var BurgerOrder = function(spec) {
     console.log("new order", spec);
     this.specification = spec;
     var i;
-    var offset = (this.specification.length / 2) * spriteHeight;
     this.burgerImage = game.add.group();
     game.ordersGroup.addChildAt(this.burgerImage, 0);
-    this.burgerImage.x = 100;
-    this.burgerImage.y = 100;
+    this.burgerImage.x = 95 + (Math.random() * 10);
+    var orderHeight = spec.length * SPRITE_HEIGHT;
+    this.burgerImage.y = orderHeight - ORDER_BG_HEIGHT + 25;
     var slip = game.add.sprite(0, 0, 'orderSlip');
-    slip.anchor.setTo(0.5, 0.5);
-    slip.scale.setTo(0.8, 0.8);
+    slip.anchor.setTo(0.5, 0);
     this.burgerImage.add(slip);
     for (i = 0; i < this.specification.length; i++) {
         var type = this.specification[i];
-        var orderIcon = game.add.sprite(0, offset + -(i * spriteHeight), 'orderIcons', type);
-        orderIcon.anchor.setTo(0.5, 0.5);
+        var orderIcon = game.add.sprite(0, 255 - (i * SPRITE_HEIGHT), 'orderIcons', type);
+        orderIcon.anchor.setTo(0.5, 1);
         this.burgerImage.add(orderIcon);
     }
-    this.burgerImage.rotation = (Math.random() * rotateRange) - (rotateRange / 2);
+    // this.burgerImage.rotation = (Math.random() * rotateRange) - (rotateRange / 2);
 };
 
 BurgerOrder.preload = function() {
-    game.load.spritesheet('orderIcons', 'images/orderIcons.png', 73, 18);
-    game.load.image('orderSlip', 'images/orderSlip.png');
+    game.load.spritesheet('orderIcons', 'images/foodorder.png', 76, 20);
+    game.load.image('orderSlip', 'images/orderbg.png');
 };
 
 BurgerOrder.prototype = {

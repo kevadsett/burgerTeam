@@ -7,7 +7,7 @@ var BurgerBit = function(yOffset, frame, group) {
     this.type = frame;
 };
 
-BurgerBit.SPRITE_SIZE = { width: 171, height: 66 };
+BurgerBit.SPRITE_SIZE = { width: 180, height: 64 };
 
 BurgerBit.preload = function() {
     game.load.spritesheet('ingredients', 'images/ingredients.png', BurgerBit.SPRITE_SIZE.width, BurgerBit.SPRITE_SIZE.height);

@@ -1,24 +1,26 @@
 var Interface = function() {
     events.on('ingredientsSet', this.onIngredientsSet, this);
     events.on('showGoButton', this.showGoButton, this);
-    game.add.sprite(0, 358, 'console');
+    game.add.sprite(0, 0, 'bg');
     this.dispenser = new Dispenser();
-    this.buttons = game.add.group();
     this.icons = game.add.group();
-    for (var i = 0; i < 4; i++) {
-        var button = game.add.button(50 + (i * 150), 393, 'ingredientButton', this.onIngredientSelected, this, 0, 0, 1, 0);
+    this.buttons = game.add.group();
+    for (var i = 0; i < 9; i++) {
+        var button = game.add.button((i * 101), 420, 'ingredientButton', this.onIngredientSelected, this, 0, 0, 1, 0);
         this.buttons.add(button);
+        var icon = game.add.sprite((i * 101), 420, 'ingredientIcons', 12);
+        this.icons.add(icon);
     }
-    this.goButton = game.add.button(840, 400, 'goButton', this.onSubmitPressed, this);
+    this.goButton = game.add.button(940, 440, 'goButton', this.onSubmitPressed, this, 0, 0, 1, 0);
     this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
     this.satisfactionMeter.anchor.setTo(0, 0.5);
 };
 
 Interface.preload = function() {
-    game.load.spritesheet('ingredientButton', 'images/ingredientButton.png', 123, 167);
-    game.load.spritesheet('ingredientIcons', 'images/ingredientIcons.png', 95, 70);
-    game.load.image('console', 'images/console.png');
-    game.load.image('goButton', 'images/goButton.png');
+    game.load.spritesheet('ingredientButton', 'images/foodselectbtns.png', 101, 131);
+    game.load.spritesheet('ingredientIcons', 'images/foodselect.png', 101, 131);
+    game.load.spritesheet('goButton', 'images/orderreadybtn.png', 82, 81);
+    game.load.image('bg', 'images/bg.png');
     Dispenser.preload();
 };
 
@@ -34,14 +36,10 @@ Interface.prototype = {
         events.emit('submitOrder');
     },
     onIngredientsSet: function(ingredients) {
-        if (this.icons) {
-            this.icons.removeAll();
-        } else {
-            this.icons = game.add.group();
-        }
         for (var i = 0; i < ingredients.length; i++) {
-            var icon = game.add.sprite(60 + (i * 150), 405, 'ingredientIcons', ingredients[i]);
-            this.icons.add(icon);
+            if (this.icons.children[i]) {
+                this.icons.getChildAt(i).frame = ingredients[i];
+            }
             this.buttons.getChildAt(i).ingredient = ingredients[i];
         }
     },

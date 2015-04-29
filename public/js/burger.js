@@ -1,7 +1,7 @@
 var Burger = function(position, spec) {
     this.bitGroup = game.add.group(game.burgersGroup);
     this.bitGroup.x = 0;
-    this.bitGroup.y = game.world.height / 2;
+    this.bitGroup.y = game.plates[0].position.y;
     this.position = position;
     this.specification = spec || [];
     if (spec) {
@@ -10,7 +10,7 @@ var Burger = function(position, spec) {
 };
 
 Burger.BUN_BOTTOM = 0;
-Burger.BUN_TOP = 1;
+Burger.BUN_TOP = 11;
 Burger.PATTY = 2;
 Burger.LETTUCE = 3;
 
@@ -29,7 +29,7 @@ Burger.prototype = {
         this.addBits(0, spec);
     },
     addNewBits: function(spec) {
-        this.addBits(this.specification.length, spec);
+        this.addBits(this.specification.length - 1, spec);
     },
     addBit: function(type) {
         new BurgerBit(this.specification.length, type, this.bitGroup);
