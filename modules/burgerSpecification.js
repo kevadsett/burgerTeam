@@ -8,7 +8,7 @@ module.exports = {
         var bitsCount = Math.min(Math.ceil(Math.random() * (difficulty + 1)), MAX_INGREDIENTS);
         var choices = [];
         while (choices.length < choiceCount) {
-            var bitChoice = 2 + Math.floor(Math.random() * (INGREDIENT_COUNT - 2));
+            var bitChoice = 1 + Math.floor(Math.random() * (INGREDIENT_COUNT - 2));
             if (choices.indexOf(bitChoice) === -1) {
                 choices.push(bitChoice);
             }
