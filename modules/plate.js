@@ -3,7 +3,7 @@ var gameSize = require('../modules/gameSize');
 var Plate = function() {
     this.position = {
         x: 0,
-        y: gameSize.height / 2
+        y: 350
     };
 };
 
