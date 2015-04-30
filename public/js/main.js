@@ -237,48 +237,40 @@ var main = {
             return game.state.start('gameOver');
         }
         var i;
-        for (i = 0; i < game.plates.length; i++) {
-            game.plates[i].position.x = data.plates[i].position.x;
-            game.plates[i].position.y = data.plates[i].position.y;
-        }
-        if (i < data.plates.length) {
-            while (i < data.plates.length) {
+        for (i = 0; i < data.plates.length; i++) {
+            if (game.plates[i]) {
+                game.plates[i].position.x = data.plates[i].position.x;
+                game.plates[i].position.y = data.plates[i].position.y;
+            } else {
                 game.plates.push(new Plate());
-                i++;
             }
         }
 
-        for (i = 0; i < game.orders.length; i++) {
-            if (!game.plates[i].beingSubmitted && JSON.stringify(game.orders[i].specification) !== JSON.stringify(data.orders[i])) {
-                game.orders[i].updateBits(data.orders[i]);
-            }
-        }
-        if (game.orders.length > data.orders.length) {
-            var deletedOrders = game.orders.splice(data.orders.length);
-            for (var j = 0; j < deletedOrders.length; j++) {
-                deletedOrders[j].destroy();
-            }
-        } else {
-            while (i < data.orders.length) {
-                game.orders.push(new BurgerOrder(data.orders[i]));
-                i++;
-            }
-        }
-        for (i = 0; i < game.burgers.length; i++) {
-            var gameBurger = game.burgers[i],
-                burgerSpec = gameBurger.specification,
-                serverSpec = data.burgers[i].specification;
-            if (JSON.stringify(burgerSpec) !== JSON.stringify(serverSpec)) {
-                if (burgerSpec.length > serverSpec.length) {
-                    gameBurger.replaceBits(serverSpec);
-                } else {
-                    gameBurger.addNewBits(serverSpec);
+        for (i = 0; i < data.orders.length; i++) {
+            if (game.orders[i]) {
+                if (!game.plates[i].beingSubmitted && JSON.stringify(game.orders[i].specification) !== JSON.stringify(data.orders[i])) {
+                    game.orders[i].updateBits(data.orders[i]);
                 }
+            } else {
+                game.orders.push(new BurgerOrder(data.orders[i]));
             }
         }
-        while (i < data.burgers.length) {
-            game.burgers.push(new Burger(game.plates[i].position, data.burgers[i].specification));
-            i++;
+
+        for (i = 0; i < data.burgers.length; i++) {
+            if (game.burgers[i]) {
+                var gameBurger = game.burgers[i],
+                    burgerSpec = gameBurger.specification,
+                    serverSpec = data.burgers[i].specification;
+                if (JSON.stringify(burgerSpec) !== JSON.stringify(serverSpec)) {
+                    if (burgerSpec.length > serverSpec.length) {
+                        gameBurger.replaceBits(serverSpec);
+                    } else {
+                        gameBurger.addNewBits(serverSpec);
+                    }
+                }
+            } else {
+                game.burgers.push(new Burger(game.plates[i].position, data.burgers[i].specification));
+            }
         }
         game.speed = data.speed;
         game.satisfaction = data.satisfaction;

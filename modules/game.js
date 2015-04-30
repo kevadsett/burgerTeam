@@ -90,7 +90,7 @@ module.exports = function(users, passcode) {
         console.log(LOCATION, playerColour + " added new " + type + " bit.");
         debugPrintPlayers();
         console.log(LOCATION, "addBit", burgers.length, burgers);
-        burgers[burgers.length - 1].addBit(type);
+        burgers[0].addBit(type);
         emitTo(playerColour === 'red' ? 'blue' : 'red', 'teammatePressed');
     }
 
@@ -156,8 +156,10 @@ module.exports = function(users, passcode) {
         if (orders.length < 1) {
             newOrder();
             randomiseIngredients();
-        } else if (Math.random() > 0.99) {
-            newOrder();
+        } else if (Math.random() > 0.9) {
+            if (plates[plates.length - 1] && plates[plates.length - 1].position.x > 185) {
+                newOrder();
+            }
         }
         for (var i = 0; i < plates.length; i++) {
             plates[i].update(dt, speed);

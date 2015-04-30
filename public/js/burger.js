@@ -29,9 +29,10 @@ Burger.prototype = {
         this.addBits(0, spec);
     },
     addNewBits: function(spec) {
-        this.addBits(this.specification.length - 1, spec);
+        this.addBits(Math.max(0, this.specification.length - 1), spec);
     },
     addBit: function(type) {
+        console.log("Adding " + type + " to " + this.specification);
         new BurgerBit(this.specification.length, type, this.bitGroup);
         this.specification.push(type);
     },
