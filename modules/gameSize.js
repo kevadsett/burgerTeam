@@ -1,3 +1,3 @@
 exports.width = 1050;
 exports.height = 600;
-exports.finalX = exports.width - 100;
+exports.finalX = exports.width - 150;

@@ -3,6 +3,7 @@ var Burger = require('../modules/burger');
 var Plate = require('../modules/plate');
 var gameLoop = require('node-gameloop');
 var gameSize = require('../modules/gameSize');
+var EventEmitter = new require('events').EventEmitter;
 
 var LOCATION = "GAME_MANAGER::";
 
@@ -13,6 +14,9 @@ module.exports = function(users, passcode) {
         INGREDIENT_COUNT = 12,
         SPEED_INCREASE_AMOUNT = 0.05,
         DIFFICULTY_INTERVAL = 5;
+
+    var events = new EventEmitter();
+    events.on('submitOrder', onSubmitOrder);
 
     var players = {},
         gameOver,
@@ -98,7 +102,14 @@ module.exports = function(users, passcode) {
     }
 
     function onSubmitOrder(playerColour, params) {
-        console.log(LOCATION, playerColour + " submitted burger:", params.targetSpec, params.burgerSpec);
+        if (!params) {
+            // must have come from server
+            params = {
+                burgerSpec: burgers[0].specification,
+                targetSpec: orders[0]
+            };
+        }
+        console.log(LOCATION, (playerColour || 'Server') + " submitted burger:", params.targetSpec, params.burgerSpec);
         var burgerCorrect = BurgerSpec.checkBurger(params.targetSpec, params.burgerSpec);
         if (burgerCorrect) {
             burgerResult = 'correct';
@@ -223,7 +234,7 @@ module.exports = function(users, passcode) {
         var order = BurgerSpec.create(difficulty);
         orders.push(order);
         console.log(LOCATION, "New burger order: " + order);
-        plates.push(new Plate());
+        plates.push(new Plate(events));
         burgers.push(new Burger());
     }
 
