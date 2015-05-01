@@ -1,3 +1,9 @@
+var SATISFACTION_BAR = {
+    x: 977,
+    y: 576,
+    width: 906,
+    height: 26
+};
 var Interface = function() {
     var i;
     this.secondsPerFrame = 1 / game.speed;
@@ -16,7 +22,7 @@ var Interface = function() {
         this.icons.add(icon);
     }
     this.goButton = game.add.button(940, 440, 'goButton', this.onSubmitPressed, this, 0, 0, 1, 0);
-    this.satisfactionMask = game.add.sprite(977, 576, 'satisfactionMask');
+    this.satisfactionMask = game.add.sprite(SATISFACTION_BAR.x, SATISFACTION_BAR.y, 'satisfactionMask');
     this.satisfactionMask.anchor.setTo(1, 0.5);
     this.satisfactionMask.scale.setTo(0, 1);
     for (i = 0; i < 5; i++) {
@@ -32,6 +38,7 @@ Interface.preload = function() {
     game.load.spritesheet('conveyor', 'images/conveyoranim180.png', 32, 32);
     game.load.image('bg', 'images/bg.png');
     game.load.image('satisfactionMask', 'images/progressmask.png');
+    game.load.image('satisfactionDent', 'images/progressdent.png');
     Dispenser.preload();
 };
 
@@ -79,6 +86,24 @@ Interface.prototype = {
     },
     updateSatisfaction: function(newSatisfaction) {
         this.satisfactionMask.scale.setTo(1 - (newSatisfaction / 100), 1);
+        if (this.dent) {
+            var x = SATISFACTION_BAR.x - (SATISFACTION_BAR.width -(SATISFACTION_BAR.width / 100) * game.satisfaction);
+            this.dent.x = x;
+        }
+    },
+    showSatisfactionDent: function(dentAmount) {
+        this.showingDent = true;
+        var width = (SATISFACTION_BAR.width / 100) * dentAmount;
+        var x = SATISFACTION_BAR.x - (SATISFACTION_BAR.width -(SATISFACTION_BAR.width / 100) * game.satisfaction);
+        var y = SATISFACTION_BAR.y;
+        this.dent = game.add.sprite(x, y, 'satisfactionDent');
+        this.dent.width = width;
+        this.dent.anchor.setTo(0, 0.5);
+        var tween = game.add.tween(this.dent).to({width: 0}, 250).delay(500).start();
+        tween.onComplete.add(function() {
+            this.showingDent = false;
+            this.dent.destroy();
+        }.bind(this));
     },
     playSubmitAnimation: function(callback, context) {
         this.dispenser.playSubmitAnim(callback, context);

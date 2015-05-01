@@ -23,7 +23,8 @@ module.exports = function(users, passcode) {
         burgers,
         satisfaction,
         loop,
-        correctOrders;
+        correctOrders,
+        burgerResult;
 
     console.log(LOCATION, "New game with users:", users.length);
     users[0].colour = Math.random > 0.5 ? 'red' : 'blue';
@@ -98,6 +99,7 @@ module.exports = function(users, passcode) {
         console.log(LOCATION, playerColour + " submitted burger:", params.targetSpec, params.burgerSpec);
         var burgerCorrect = BurgerSpec.checkBurger(params.targetSpec, params.burgerSpec);
         if (burgerCorrect) {
+            burgerResult = 'correct';
             console.log("You got it right");
             satisfaction = Math.min(100, satisfaction + CORRECT_REWARD);
             speed += SPEED_INCREASE_AMOUNT;
@@ -111,6 +113,7 @@ module.exports = function(users, passcode) {
             speed+=5;
         } else {
             console.log("You got it wrong");
+            burgerResult = 'incorrect';
             satisfaction = Math.max(0, satisfaction - INCORRECT_PENALTY);
         }
         popOrder();
@@ -176,8 +179,12 @@ module.exports = function(users, passcode) {
             burgers: burgers,
             speed: speed,
             satisfaction: satisfaction,
-            gameOver: gameOver
+            gameOver: gameOver,
+            burgerResult: burgerResult
         }, true);
+        if (burgerResult) {
+            burgerResult = null;
+        }
     }
 
     function broadcast(name, details, hideMessage) {

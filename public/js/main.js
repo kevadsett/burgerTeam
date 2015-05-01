@@ -235,6 +235,9 @@ var main = {
         if (data.gameOver) {
             return game.state.start('gameOver');
         }
+        if (data.burgerResult === 'incorrect' && !game.interface.showingDent) {
+            game.interface.showSatisfactionDent(INCORRECT_PENALTY);
+        }
         var i;
         for (i = 0; i < data.plates.length; i++) {
             if (game.plates[i]) {
@@ -313,6 +316,9 @@ var main = {
         } else {
             console.log("You got it wrong!");
             game.satisfaction = Math.min(100, game.satisfaction - INCORRECT_PENALTY);
+            if (!game.interface.showingDent) {
+                game.interface.showSatisfactionDent(INCORRECT_PENALTY);
+            }
         }
         frontBurger.destroy();
         firstBurgerOrder.destroy();
