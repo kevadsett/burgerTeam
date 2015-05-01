@@ -223,7 +223,6 @@ var main = {
         for (i = 0; i < game.burgers.length; i++) {
             game.burgers[i].update();
         }
-
         var newX = 0, nextX = 0;
         if (game.plates[0] && game.plates[0].position) {
             newX =  game.plates[0].position.x;

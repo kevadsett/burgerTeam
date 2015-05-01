@@ -125,7 +125,6 @@ module.exports = function(users, passcode) {
             if (correctOrders % 3) {
                 BurgerSpec.addIngredientChoice();
             }
-            speed+=5;
         } else {
             console.log("You got it wrong");
             burgerResult = 'incorrect';
