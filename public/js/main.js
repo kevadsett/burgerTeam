@@ -312,10 +312,10 @@ var main = {
         var frontPlate = game.plates.shift();
         if (firstBurgerOrder.checkBurger(frontBurger)) {
             console.log("You got it right!");
-            game.satisfaction = Math.min(100, game.satisfaction + CORRECT_REWARD);
+            // game.satisfaction = Math.min(100, game.satisfaction + CORRECT_REWARD);
         } else {
             console.log("You got it wrong!");
-            game.satisfaction = Math.min(100, game.satisfaction - INCORRECT_PENALTY);
+            // game.satisfaction = Math.min(100, game.satisfaction - INCORRECT_PENALTY);
             if (!game.interface.showingDent) {
                 game.interface.showSatisfactionDent(INCORRECT_PENALTY);
             }
