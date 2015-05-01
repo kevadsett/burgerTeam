@@ -91,8 +91,10 @@ module.exports = function(users, passcode) {
         console.log(LOCATION, playerColour + " added new " + type + " bit.");
         debugPrintPlayers();
         console.log(LOCATION, "addBit", burgers.length, burgers);
-        burgers[0].addBit(type);
-        emitTo(playerColour === 'red' ? 'blue' : 'red', 'teammatePressed');
+        if (burgers[0]) {
+            burgers[0].addBit(type);
+            emitTo(playerColour === 'red' ? 'blue' : 'red', 'teammatePressed');
+        }
     }
 
     function onSubmitOrder(playerColour, params) {

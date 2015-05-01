@@ -1,4 +1,4 @@
-var debugMode = true;
+var debugMode = false;
 var SATISFACTION_RATE = 0.5,
     CORRECT_REWARD = 5,
     INCORRECT_PENALTY = 5,
