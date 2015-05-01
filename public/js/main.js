@@ -147,8 +147,8 @@ var gameOver = {
     create: function() {
         events.off();
         var message = "You're fired!";
-        var quitButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'quitButton', this.onQuit, 1, 1, 0, 1);
-            quitButton.anchor.setTo(0.5, 0.5);
+        // var quitButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'quitButton', this.onQuit, 1, 1, 0, 1);
+            // quitButton.anchor.setTo(0.5, 0.5);
         if (isHosting) {
             var playAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'playAgainButton', this.onPlayAgain, 1, 1, 0, 1);
             playAgainButton.anchor.setTo(0.5, 0.5);
