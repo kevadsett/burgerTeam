@@ -70,10 +70,12 @@ module.exports = function(users, passcode) {
 
     function onPlayerReady(playerColour) {
         var player = players[playerColour];
-        console.log(LOCATION, playerColour + " player ready (" + player.id + ")");
-        player.ready = true;
-        if (checkAllPlayersReady()) {
-            startGame();
+        if (player) {
+            console.log(LOCATION, playerColour + " player ready (" + player.id + ")");
+            player.ready = true;
+            if (checkAllPlayersReady()) {
+                startGame();
+            }
         }
     }
 
