@@ -89,8 +89,6 @@ module.exports = function(users, passcode) {
         satisfaction = 100;
         loop = gameLoop.setGameLoop(update, 1000 / 10);
         correctOrders = 0;
-        randomiseIngredients();
-        randomiseGoButton();
     }
 
     function onNewBit(playerColour, type) {
