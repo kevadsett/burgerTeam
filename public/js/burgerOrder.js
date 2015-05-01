@@ -15,15 +15,15 @@ var BurgerOrder = function(spec) {
     this.burgerImage.add(slip);
     for (i = 0; i < this.specification.length; i++) {
         var type = this.specification[i];
-        var orderIcon = game.add.sprite(0, 255 - (i * SPRITE_HEIGHT), 'orderIcons', type);
+        var orderIcon = game.add.sprite(0, 255 - (i * SPRITE_HEIGHT), 'ingredients', type);
         orderIcon.anchor.setTo(0.5, 1);
+        orderIcon.scale.setTo(0.5, 0.5);
         this.burgerImage.add(orderIcon);
     }
     // this.burgerImage.rotation = (Math.random() * rotateRange) - (rotateRange / 2);
 };
 
 BurgerOrder.preload = function() {
-    game.load.spritesheet('orderIcons', 'images/foodorder.png', 76, 20);
     game.load.image('orderSlip', 'images/orderbg.png');
 };
 
@@ -48,8 +48,9 @@ BurgerOrder.prototype = {
                 existingBit.frame = newBits[i];
             } else {
                 console.log("Making new " + newBits[i]);
-                var orderIcon = game.add.sprite(0, 255 - (i * SPRITE_HEIGHT), 'orderIcons', newBits[i]);
-                orderIcon.anchor.setTo(0.5, 0.5);
+                var orderIcon = game.add.sprite(0, 255 - (i * SPRITE_HEIGHT), 'ingredients', newBits[i]);
+                orderIcon.anchor.setTo(0.5, 1);
+                orderIcon.scale.setTo(0.5, 0.5);
                 this.burgerImage.add(orderIcon);
             }
         }
