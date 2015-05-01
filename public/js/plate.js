@@ -17,9 +17,6 @@ Plate.prototype = {
         if (!this.beingSubmitted) {
             this.position.x += dt * game.speed;
             this.sprite.x = this.position.x;
-            if (this.position.x > game.finalX) {
-                events.emit('submitOrder');
-            }
         }
     },
     destroy: function() {
