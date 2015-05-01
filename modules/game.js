@@ -140,10 +140,18 @@ module.exports = function(users, passcode) {
         }
         console.log(LOCATION, "randomIngredients:", randomIngredients);
         for (i = 0; i < randomIngredients.length; i++) {
-            if (Math.random() > 0.5 && blueIngredients.length < 9) {
-                blueIngredients.push(randomIngredients[i]);
+            if (Math.random() > 0.5) {
+                if (blueIngredients.length < 9) {
+                    blueIngredients.push(randomIngredients[i]);
+                } else if (redIngredients.length < 9) {
+                    redIngredients.push(randomIngredients[i]);
+                }
             } else {
-                redIngredients.push(randomIngredients[i]);
+                if (redIngredients.length < 9) {
+                    redIngredients.push(randomIngredients[i]);
+                } else if (blueIngredients.length < 9) {
+                    blueIngredients.push(randomIngredients[i]);
+                }
             }
         }
         debugPrintPlayers();
