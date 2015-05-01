@@ -7,7 +7,7 @@ var gameSize = require('../modules/gameSize');
 var LOCATION = "GAME_MANAGER::";
 
 module.exports = function(users, passcode) {
-    var SATISFACTION_RATE = 0,
+    var SATISFACTION_RATE = 0.5,
         CORRECT_REWARD = 5,
         INCORRECT_PENALTY = 5,
         INGREDIENT_COUNT = 12,

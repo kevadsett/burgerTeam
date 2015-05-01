@@ -16,8 +16,9 @@ var Interface = function() {
         this.icons.add(icon);
     }
     this.goButton = game.add.button(940, 440, 'goButton', this.onSubmitPressed, this, 0, 0, 1, 0);
-    // this.satisfactionMeter = game.add.sprite(48, 48, 'satisfaction');
-    // this.satisfactionMeter.anchor.setTo(0, 0.5);
+    this.satisfactionMask = game.add.sprite(977, 576, 'satisfactionMask');
+    this.satisfactionMask.anchor.setTo(1, 0.5);
+    this.satisfactionMask.scale.setTo(0, 1);
     for (i = 0; i < 5; i++) {
         var conveyorWheel = game.add.sprite(85 + (i * 201), 394, 'conveyor', Math.floor(Math.random() * 17));
         this.conveyor.add(conveyorWheel);
@@ -30,6 +31,7 @@ Interface.preload = function() {
     game.load.spritesheet('goButton', 'images/orderreadybtn.png', 82, 81);
     game.load.spritesheet('conveyor', 'images/conveyoranim180.png', 32, 32);
     game.load.image('bg', 'images/bg.png');
+    game.load.image('satisfactionMask', 'images/progressmask.png');
     Dispenser.preload();
 };
 
@@ -76,7 +78,7 @@ Interface.prototype = {
         }
     },
     updateSatisfaction: function(newSatisfaction) {
-        // this.satisfactionMeter.scale.setTo(newSatisfaction / 100, 1);
+        this.satisfactionMask.scale.setTo(1 - (newSatisfaction / 100), 1);
     },
     playSubmitAnimation: function(callback, context) {
         this.dispenser.playSubmitAnim(callback, context);

@@ -1,5 +1,5 @@
-var debugMode = false;
-var SATISFACTION_RATE = 0,
+var debugMode = true;
+var SATISFACTION_RATE = 0.5,
     CORRECT_REWARD = 5,
     INCORRECT_PENALTY = 5,
     INGREDIENT_COUNT = 12;
@@ -221,9 +221,8 @@ var main = {
             nextX = game.plates[0].position.x + (dt * game.speed);
         }
         game.interface.updateDispenserPosition(dt, newX, nextX);
-        if (!debugMode) {
-            game.satisfaction = Math.max(0, game.satisfaction - dt * SATISFACTION_RATE);
-        } else {
+        game.satisfaction = Math.max(0, game.satisfaction - dt * SATISFACTION_RATE);
+        if (debugMode) {
             this.timer++;
             if (!(this.timer % 1000)) {
                 this.addNewOrder();
