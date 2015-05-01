@@ -14,7 +14,7 @@ function setStatusText(text) {
         game.statusText.text = text;
     } else {
         console.log("Creating new text as \"" + text + "\"");
-        game.statusText = game.add.text(game.world.width / 2, game.world.height / 2, text);
+        game.statusText = game.add.text(game.world.width / 2, 490, text, {fill: '#fff'});
         game.statusText.anchor.setTo(0.5, 0.5);
     }
 }
@@ -66,6 +66,7 @@ var setup = {
         game.load.spritesheet('hostGameButton', 'images/hostbtn.png', 216, 127);
         game.load.spritesheet('joinGameButton', 'images/joinbtn.png', 216, 127);
         game.load.spritesheet('playAgainButton', 'images/playagainbtn.png', 216, 127);
+        game.load.image('home', 'images/homebg.png');
         // game.load.spritesheet('quitButton', 'images/quitbtn.png');
     },
     create: function() {
@@ -96,9 +97,11 @@ var newGame = {
             playerDisconnected = false;
             setStatusText('Other player was disconnected');
         }
-        var hostButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'hostGameButton', this.onHostGame, 1, 1, 0, 1);
+        var bg = game.add.sprite(0, 0, 'home');
+        bg.height = 600;
+        var hostButton = game.add.button((game.world.width / 2) - 200, 500, 'hostGameButton', this.onHostGame, 1, 1, 0, 1);
         hostButton.anchor.setTo(0.5, 0.5);
-        var joinButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'joinGameButton', this.onJoinGame, 1, 1, 0, 1);
+        var joinButton = game.add.button((game.world.width / 2) + 200, 500, 'joinGameButton', this.onJoinGame, 1, 1, 0, 1);
         joinButton.anchor.setTo(0.5, 0.5);
     },
     onHostGame: function() {
@@ -111,6 +114,8 @@ var newGame = {
 
 var joinGame = {
     create: function() {
+        var bg = game.add.sprite(0, 0, 'home');
+        bg.height = 600;
         var passcode = window.prompt('enter passcode:');
         setStatusText('Please wait, joining game.');
         events.on('gameReady', function() {
@@ -118,10 +123,10 @@ var joinGame = {
         });
         events.on('noGameError', function() {
             setStatusText('No such game');
-            var tryAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'tryAgainButton', function() {
-                game.state.start('newGame');
-            }, 1, 1, 0, 1);
-            tryAgainButton.anchor.setTo(0.5, 0.5);
+            // var tryAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'tryAgainButton', function() {
+                // game.state.start('newGame');
+            // }, 1, 1, 0, 1);
+            // tryAgainButton.anchor.setTo(0.5, 0.5);
         });
         emit('joinGame', passcode);
     }
@@ -129,6 +134,8 @@ var joinGame = {
 
 var hostGame = {
     create: function() {
+        var bg = game.add.sprite(0, 0, 'home');
+        bg.height = 600;
         events.on('passcodeGenerated', function(passcode) {
             setStatusText("Game passcode: " + passcode + "\nGive this code to the second player to begin");
         });
@@ -146,11 +153,13 @@ var disconnected = {
 var gameOver = {
     create: function() {
         events.off();
+        var bg = game.add.sprite(0, 0, 'home');
+        bg.height = 600;
         var message = "You're fired!";
-        // var quitButton = game.add.button(game.world.width / 2, (game.world.height / 2) + 136, 'quitButton', this.onQuit, 1, 1, 0, 1);
+        // var quitButton = game.add.button((game.world.width / 2) + 200, 500, 'quitButton', this.onQuit, 1, 1, 0, 1);
             // quitButton.anchor.setTo(0.5, 0.5);
         if (isHosting) {
-            var playAgainButton = game.add.button(game.world.width / 2, (game.world.height / 2) - 136, 'playAgainButton', this.onPlayAgain, 1, 1, 0, 1);
+            var playAgainButton = game.add.button((game.world.width / 2) - 200, 500, 'playAgainButton', this.onPlayAgain, 1, 1, 0, 1);
             playAgainButton.anchor.setTo(0.5, 0.5);
         } else {
             message += "\nWaiting for host.";
